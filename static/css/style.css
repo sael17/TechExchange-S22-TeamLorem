@@ -1,0 +1,29 @@
+/* Basic Color Palette for Website */
+
+:root{
+    --color-primary: #FFBF69;
+    --color-secondary: #CBF3F0;
+
+    --color-primary-dark:#FF9F1C;
+    --color-secondary-dark: #2bbbb0;
+    
+    --color-white: #FFFFFF;
+    --color-black: #000;
+}
+
+/* Reset Styles for web browsers consistency  */
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html{
+    background-color: var(--color-secondary-dark);
+}
+
+.navbar{
+    background-color: var(--color-primary-dark);
+}
+
