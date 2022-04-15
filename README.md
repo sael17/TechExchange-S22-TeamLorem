@@ -16,7 +16,7 @@ To install all dependencies do ``pip install -r requirements.txt``
 
 To install a python package do ``pip install <package_name>``
 
-To update the *requirements.txt* file do ``pip freeze --local requirements.txt``
+To update the *requirements.txt* file do ``pip freeze --local > requirements.txt``
 
 ## Run the app:
 ``flask run`` to run the app while the *venv* is active
