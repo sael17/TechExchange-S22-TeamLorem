@@ -13,6 +13,7 @@ import secrets
 import bcrypt 
 import certifi
 import os
+import model
 
 # -- Initialization section --
 app = Flask(__name__)
@@ -41,4 +42,10 @@ INDEX route, initial route
 @app.route('/')
 @app.route('/home')
 def index():
-    return render_template('index.html')
+    data = posts.find({})
+    result = []
+    for entry in data:
+        result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+    if result:
+        return render_template('index.html', home_posts=result)
+    return render_template('index.html',error='There are no posts available')

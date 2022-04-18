@@ -19,11 +19,36 @@
     box-sizing: border-box;
 }
 
-html{
-    background-color: var(--color-secondary-dark);
+body{
+    background-color: var(--color-secondary-dark)!important;
 }
 
 .navbar{
     background-color: var(--color-primary-dark);
 }
 
+.container{
+    color:white;
+    background-color: var(--color-primary);
+    outline-color: var(--color-primary);
+    border-radius: 25px;
+}
+
+.group-info{
+    padding:1%;
+    text-align: center;
+}
+
+img{
+    border-radius: 50%;
+    float: left;
+    max-width: 100%;
+}
+
+.post-content{
+    padding: 1%;
+}
+
+.date{
+    float:right;
+}
