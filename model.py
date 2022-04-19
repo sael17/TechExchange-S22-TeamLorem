@@ -6,6 +6,15 @@ from backend import (
     user
 )
 
+from post import Post
+
+
+'''
+Controller
+'''
+def create_post(author, group, content, date, image):
+    return Post(author, group, content, date, image)
+
 
 def add_user(user:user.User,users:collection,message:dict):
     """ Adds a user to the users collection in the DB
