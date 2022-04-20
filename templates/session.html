@@ -1,36 +1,57 @@
-
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/static/css/session.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
 </head>
 
+{%block content%}
+   
 <body class="main-container" onload="document.FormName.reset();">
 
     <section class="form-container">
         <h1 class="company-title">Goal Up &uarr;</h1>
 
+        {%if sign_up%}
+        <form action="/signup" method="post" class="login-form" id="login-form">
+        {%else%}
         <form action="/login" method="post" class="login-form" id="login-form">
+        {%endif%}
 
             <div class="input-container">
+                {%if sign_up%}
                 <input type="email" name="email" placeholder="example@email.com" 
-                pattern="^\S+$" required>
+                pattern="(?<=(,|;|:))\s(?=((?:(?!<).)*>))" required>
+                {%else%}
+                <input type="email" name="email" placeholder="example@email.com" 
+                required>
+                {%endif%}
             </div>
-
+            
+            {%if sign_up%}
             <div class="input-container">
-                <input type="text" name="username" placeholder="username" 
-                pattern="^\S+$" required>
+                <input type="text" name="username" placeholder="username"required>
             </div>
-
-
+            {%endif%}
+           
             <div class="input-container input-container--password">
+                {%if %}
                 <input type="password" name="password" id="password" 
                 placeholder="password" pattern="^\S+$" required>
                 <i class="bi bi-eye-slash" id="togglePassword"></i>
             </div>
 
+            <section>
+                {%if error_message%}
+                    <span class="error-message">{{error_message}}</span>
+                {%endif%}
+            </section>
+
             <div class="input-container--login">
+                {%if sign_up%}
+                <input type="submit" value="Sign Up">
+                {%else%}
                 <input type="submit" value="Log In">
+                {%endif%}
             </div>
 
             <div class="or-container">
@@ -39,8 +60,13 @@
 
             <div class="options">
                 <!-- Credits to https://codepen.io/mupkoo/pen/YgddgB    -->
+                {%if sign_up%}
                 <a href="https://myaccount.google.com/?utm_source=sign_in_no_continue&pli=1"
-                    class="login-with-google-btn">Sign in with Google</a>
+                    class="login-with-google-btn">Sign Up with Google</a>
+                {%else%}
+                <a href="https://myaccount.google.com/?utm_source=sign_in_no_continue&pli=1" 
+                class="login-with-google-btn">Log in with Google</a>
+                {%endif%}
             </div>
 
         </form>
@@ -49,8 +75,13 @@
 
     <section class="signup-container">
         <div class="signup">
+            {%if sign_up%}
             <p class="signup-text">Already Goaling Up?</p>
-            <a href="/signup" class="signup-link"><span>Log In &rarr;</span></a>
+            <a href="/login" class="signup-link"><span>Log In &rarr;</span></a>
+            {%else%}
+            <p class="signup-text">Want to start Goaling Up?</p>
+            <a href="/signup" class="signup-link"><span>Sign Up &rarr;</span></a>
+            {%endif%}
         </div>
     </section>
 
@@ -69,4 +100,6 @@
         });
     </script>
 </body>
+
+{%endblock%}
 
