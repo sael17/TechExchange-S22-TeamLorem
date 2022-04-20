@@ -35,7 +35,13 @@ def add_user(user:user.User,users:collection,message:dict):
 
     try:
         users.insert_one(user.to_document())
-    
+        # encode password for hashing
+        password = user.password
+        # hash password
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(password, salt)
+        users.update_one({user.email:{"password":hashed}})
+
     except:
         message["error"] = "Could not sign up at the moment. Please make sure the field are correct or try again later."
 
