@@ -47,7 +47,7 @@ posts = mongo.db.posts
 INDEX route, initial route
 '''
 @app.route('/')
-@app.route('/index')
+@app.route('/index',methods=["GET","POST"])
 def index():
     data = posts.find({})
     result = []
