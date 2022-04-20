@@ -63,10 +63,12 @@ class TestUser(unittest.TestCase):
         self.assertRaises(ValueError,user.User,test_email,test_username, "")
 
     def test_pw_to_star(self):
-        self.assertEqual(len(self.user01.password),len(self.user01.password))
-        self.assertEqual(len(self.user02.password),len(self.user02.password))
-        self.assertEqual(len(self.user03.password),len(self.user03.password))
-        self.assertEqual(len(self.user04.password),len(self.user04.password))
+        self.assertEqual(len(self.user01.password),len(self.user01.star_pw))
+        self.assertEqual(len(self.user02.password),len(self.user02.star_pw))
+        self.assertEqual(len(self.user03.password),len(self.user03.star_pw))
+        self.assertEqual(len(self.user04.password),len(self.user04.star_pw))
+
+        self.assertEqual(self.user03.star_pw,"***********")
 
 
     def test_can_moderate(self):
@@ -87,6 +89,7 @@ class TestUser(unittest.TestCase):
 
 
     def test_from_document(self):
+
         # user01 = user.User(test_email,test_username,test_password)
         # user02 = user.User("yan.aquino1@upr.edu","yanc@aquino","123456789")
         # user03 = user.User("brandong.fung@techexchange.in","branfung","bran.fung12")
@@ -95,7 +98,10 @@ class TestUser(unittest.TestCase):
         "username":"juan.delcampo@1","password":"google@2022"})
 
         # test object has been created
+        self.assertEqual(temp_user.email,"juan.delcampo@upr.edu")
+        self.assertEqual(temp_user.username, "juan.delcampo@1")
         self.assertEqual(temp_user.canModerate,False)
+        
         # test if to document works too
         self.assertEqual(temp_user.to_document,{"email":"juan.delcampo@upr.edu",
         "username":"juan.delcampo@1","password":"google@2022"})
