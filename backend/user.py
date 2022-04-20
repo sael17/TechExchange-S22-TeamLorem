@@ -1,4 +1,4 @@
-from pydoc import doc
+import bcrypt
 import re
 
 # Make a regular expression
@@ -41,6 +41,7 @@ class User:
         self.email = email
         self.username = username
         self.password = password
+        # self.star_pw = self.pw_to_star(self.password)
         self.canModerate = False
 
     def __str__(self) -> str:
@@ -50,16 +51,18 @@ class User:
     @classmethod
     def from_document(cls,document):
         """Constructs and returns a new User from a JSON Document """
-
-        return User(document["email"],document["username"],document["password"])
+        return User(document['email'], document['username'], document['password'])
 
     def to_document(self):
         """Returns the user instance as a JSON Document """
 
+        # encrypt password for security reasons
+        salt = bcrypt.gensalt()
+
         return {
             "email":self.email,
             "username":self.username,
-            "password":self.password
+            "password":bcrypt.hashpw(self.password.encode('utf-8'),salt)
         }
 
     def pw_to_star(password:str) -> str:
