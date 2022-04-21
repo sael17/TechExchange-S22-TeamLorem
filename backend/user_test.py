@@ -1,6 +1,5 @@
-from backend import user
 import unittest
-
+import user
 
 # Data For Initial Tests
 test_email = "email@email.com"
@@ -63,10 +62,10 @@ class TestUser(unittest.TestCase):
         self.assertRaises(ValueError,user.User,test_email,test_username, "")
 
     def test_pw_to_star(self):
-        self.assertEqual(len(self.user01.password),len(self.user01.star_pw))
-        self.assertEqual(len(self.user02.password),len(self.user02.star_pw))
-        self.assertEqual(len(self.user03.password),len(self.user03.star_pw))
-        self.assertEqual(len(self.user04.password),len(self.user04.star_pw))
+        self.assertEqual(len(self.user01.getPW()),len(self.user01.star_pw))
+        self.assertEqual(len(self.user02.getPW()),len(self.user02.star_pw))
+        self.assertEqual(len(self.user03.getPW()),len(self.user03.star_pw))
+        self.assertEqual(len(self.user04.getPW()),len(self.user04.star_pw))
 
         self.assertEqual(self.user03.star_pw,"***********")
 
@@ -89,21 +88,17 @@ class TestUser(unittest.TestCase):
 
 
     def test_from_document(self):
-
-        # user01 = user.User(test_email,test_username,test_password)
-        # user02 = user.User("yan.aquino1@upr.edu","yanc@aquino","123456789")
-        # user03 = user.User("brandong.fung@techexchange.in","branfung","bran.fung12")
-        # user04 = user.User("user04@email.com","user04","user01_is_the_best")
-        temp_user = user.User.from_document({"email":"juan.delcampo@upr.edu",
+        self.temp = user.User.from_document({"email":"juan.delcampo@upr.edu",
         "username":"juan.delcampo@1","password":"google@2022"})
 
+        
         # test object has been created
-        self.assertEqual(temp_user.email,"juan.delcampo@upr.edu")
-        self.assertEqual(temp_user.username, "juan.delcampo@1")
-        self.assertEqual(temp_user.canModerate,False)
+        self.assertEqual(self.temp.email,"juan.delcampo@upr.edu")
+        self.assertEqual(self.temp.username, "juan.delcampo@1")
+        self.assertEqual(self.temp.canModerate,False)
         
         # test if to document works too
-        self.assertEqual(temp_user.to_document,{"email":"juan.delcampo@upr.edu",
+        self.assertEqual(self.temp.to_document(),{"email":"juan.delcampo@upr.edu",
         "username":"juan.delcampo@1","password":"google@2022"})
 
 if __name__ == '__main__':

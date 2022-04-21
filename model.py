@@ -61,7 +61,7 @@ def authenticate_user(user:user.User,users:collection,errors:dict):
         # grab the password in the DB
         password_in_db = login_user["password"]
         # encode the password for security purposes
-        encoded_password = user.password.encode("utf-8")
+        encoded_password = user.getPW().encode("utf-8")
         # compare if the hashed user password is the same as the one in the db
         if not bcrypt.checkpw(encoded_password,password_in_db):
             # if we arrive here it means the password was invalid

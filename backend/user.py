@@ -36,17 +36,31 @@ class User:
         if len(password) < 8 or len(password) > 24:
             raise ValueError("Password must be greater than 8 but less than 24 characters")
 
-        
-
+    
         self.email = email
         self.username = username
-        self.password = password
-        # self.star_pw = self.pw_to_star(self.password)
+        self.__password = password
+        self.star_pw = self.pw_to_star(password)
         self.canModerate = False
 
     def __str__(self) -> str:
         return "Email: {}'\n' " + "Username: {}'\n' " + "Password: {}".format(self.email,
-        self.username,self.pw_to_star(self.password))
+        self.username,self.pw_to_star(self.getPW()))
+
+
+    def pw_to_star(self,password:str) -> str:
+        star_pw = []
+        password = self.getPW()
+        for _ in password:
+            star_pw.append("*")
+
+        return "".join(star_pw)
+
+        """ Returns the user's password protected field
+        """
+    def getPW(self) -> str:
+        return self.__password
+
 
     @classmethod
     def from_document(cls,document):
@@ -62,17 +76,12 @@ class User:
         return {
             "email":self.email,
             "username":self.username,
-            "password":bcrypt.hashpw(self.password.encode('utf-8'),salt)
+            # uncomment this for testing
+            "password":self.getPW()
+            # comment this for testing
+            # "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt)
         }
 
-    def pw_to_star(password:str) -> str:
-        star_pw = []
-        for _ in password:
-            star_pw.append("*")
 
-        return "".join(star_pw)
-
-    def get_canModerate(self) -> bool:
-        return self.canModerate
 
     

@@ -19,8 +19,11 @@
 
             <div class="input-container">
                 {%if sign_up%}
-                <input type="email" name="email" placeholder="example@email.com" 
-                required>
+                <input type="email" name="email" placeholder="example@email.com" required
+                title="Please input a valid email format"
+                patter="/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}
+                [a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/"
+                >
                 {%else%}
                 <input type="email" name="email" placeholder="example@email.com" 
                 required>
@@ -29,14 +32,26 @@
             
             {%if sign_up%}
             <div class="input-container">
-                <input type="text" name="username" placeholder="username"required>
+                <input type="text" name="username" placeholder="username" required
+                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}"
+                minlength="6" maxlength="16">
             </div>
             {%endif%}
            
             <div class="input-container input-container--password">
+                {%if sign_up%}
                 <input type="password" name="password" id="password" 
-                placeholder="password" pattern="^\S+$" required>
+                placeholder="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.@$]).{8,25}" 
+                title="password must have at least one uppercase, one lowercase,one number one special character and must  be between 8 and 24 characters"
+                minlength="8" maxlength="24" required>
                 <i class="bi bi-eye-slash" id="togglePassword"></i>
+                {%else%}
+                <input type="password" name="password" id="password" 
+                placeholder="password" required>
+                <i class="bi bi-eye-slash" id="togglePassword"></i>
+                {%endif%}
+                                
             </div>
 
             <section>
@@ -66,17 +81,7 @@
                     data-theme="outline" data-text="sign_in_with"
                     data-shape="rectangular" data-logo_alignment="left">
                 </div>
-                <!-- Credits to https://codepen.io/mupkoo/pen/YgddgB   
-                {%if sign_up%}
-                
-                <a href="https://myaccount.google.com/?utm_source=sign_in_no_continue&pli=1"
-                    class="login-with-google-btn">Sign Up with Google</!<div> 
-                {%else%}
-                <a href="https://myaccount.google.com/?utm_source=sign_in_no_continue&pli=1" 
-                class="login-with-google-btn">Log in with Google</a>
-                {%endif%} -->
             </div>
-
         </form>
 
     </section>
