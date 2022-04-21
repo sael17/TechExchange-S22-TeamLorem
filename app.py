@@ -10,6 +10,8 @@ from flask import (
 )
 
 from flask_pymongo import PyMongo
+from google.oauth2 import id_token
+from google.auth.transport import requests
 import model
 import gunicorn # for heroku deployment
 import secrets
@@ -49,16 +51,48 @@ INDEX route, initial route
 @app.route('/index',methods=["GET","POST"])
 def index():
     if request.method == "POST":
-        if request.form["credential"]:
-            return request.form["credential"]
+        email = verify_credentials()
+        return render_template("index.html",error=email)
+
         
-    data = posts.find({})
-    result = []
-    for entry in data:
-        result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
-    if result:
-        return render_template('index.html', home_posts=result)
-    return render_template('index.html',error='There are no posts available')
+
+    else:
+        data = posts.find({})
+        result = []
+        for entry in data:
+            result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+        if result:
+            return render_template('index.html', home_posts=result)
+        return render_template('index.html',error='There are no posts available')
+
+
+
+@app.before_request
+def verify_credentials():
+    if request.form["credential"]:
+            csrf_token_cookie = request.cookies.get('g_csrf_token')
+            if not csrf_token_cookie:
+                return "Error"
+            csrf_token_body = request.get('g_csrf_token')
+            if not csrf_token_body:
+                 return "Error"
+            if csrf_token_cookie != csrf_token_body:
+                 return "Error"
+
+            # (Receive token by HTTPS POST)
+            
+            try:
+                # Specify the CLIENT_ID of the app that accesses the backend:
+                idinfo = id_token.verify_oauth2_token(csrf_token_cookie, requests.Request(), 
+                "578828002560-51agl16hghjdsl9roobutc34cdc4v487.apps.googleusercontent.com")
+                # ID token is valid. Get the user's Google Account ID from the decoded token.
+                userid = idinfo['email']
+                return userid
+
+            except ValueError:
+                # Invalid token
+                pass
+
 
 
 @app.route("/signup",methods=["GET","POST"])
