@@ -1,5 +1,7 @@
 import unittest
 import user
+import admin
+
 
 # Data For Initial Tests
 test_email = "email@email.com"
@@ -11,8 +13,8 @@ class TestUser(unittest.TestCase):
      # User instances to test
     user01 = user.User(test_email,test_username,test_password)
     user02 = user.User("yan.aquino1@upr.edu","yanc@aquino","123456789")
-    user03 = user.User("brandong.fung@techexchange.in","branfung","bran.fung12")
-    user04 = user.User("user04@email.com","user04","user01_is_the_best")
+    user03 = admin.Admin("brandong.fung@techexchange.in","branfung","bran.fung12")
+    user04 = admin.Admin("user04@email.com","user04","user01_is_the_best")
 
 
     def test_argument_types(self):
@@ -73,8 +75,8 @@ class TestUser(unittest.TestCase):
     def test_can_moderate(self):
         self.assertEqual(self.user01.canModerate,False)
         self.assertEqual(self.user02.canModerate,False)
-        self.assertEqual(self.user03.canModerate,False)
-        self.assertEqual(self.user04.canModerate,False)
+        self.assertEqual(self.user03.canModerate,True)
+        self.assertEqual(self.user04.canModerate,True)
 
     def test_to_document(self):
         self.assertEqual(self.user01.to_document(),{"email":test_email,"username":test_username,
