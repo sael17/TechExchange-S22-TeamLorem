@@ -236,6 +236,13 @@ form i {
 	margin: 0 auto;
 	font-family: sans-serif;
 	font-size: small;
+	margin-bottom: 1.5rem;
+}
+
+#g_id_onload span{
+	color: var(--color-black);
+	font-size: medium;
+	font-family: sans-serif;
 }
 
 @media (max-width:1200px){
