@@ -48,6 +48,10 @@ INDEX route, initial route
 @app.route('/')
 @app.route('/index',methods=["GET","POST"])
 def index():
+    if request.method == "POST":
+        if request.form["credential"]:
+            return request.form["credential"]
+        
     data = posts.find({})
     result = []
     for entry in data:
