@@ -40,58 +40,6 @@ def authenticate_user(user:User,users:collection,errors:dict):
         errors["message"] = "Incorrect User/User does not exist."
 
 
-# -- Object Oriented Function --
-'''
-User
-'''
-
-def create_user(email, username, password):
-    
-    try:
-        user = User(email, username, password)
-        return user
-    except TypeError:
-        # TODO: return error message for TypeError
-        pass
-    except ValueError:
-        # TODO: return error message for ValueError
-        pass
-
-
-'''
-Post
-'''
-def create_post(author, group, content, date, image):
-    
-    try:
-        post = Post(author, group, content, date, image)
-        return post
-    except TypeError:
-        # TODO: return error message for TypeError
-        pass
-    except ValueError:
-        # TODO: return error message for ValueError
-        pass
-
-'''
-Group
-'''    
-def create_group(creator, name, date_created):
-    
-    try:
-        group = Group(creator, name, date_created)
-        return group
-    except TypeError:
-        # TODO: return error message for TypeError
-        pass
-    except ValueError:
-        # TODO: return error message for ValueError
-        pass
-
-
-
-
-
 # -- MONGODB CRUD Functions --
 
 '''
