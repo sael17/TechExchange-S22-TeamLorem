@@ -2,9 +2,9 @@ import bcrypt
 from pymongo import collection
 from bson import ObjectId
 from backend.user import User
-# from backend.admin import Admin
+from backend.admin import Admin
 from backend.post import Post
-# from backend.group import Group
+from backend.group import Group
 
 
 # -- MODEL functions --
@@ -98,34 +98,33 @@ CREATE post
 '''
 CREATE group
 '''
-# def add_group(group: Group, groups: collection, errors: dict):
-#     """Adds a Group to the group collection in the DB
+def add_group(group: Group, groups: collection, errors: dict):
+    """Adds a Group to the group collection in the DB
 
-#     Args:
-#         group (Group): Group object to insert to the DB
-#         groups (collection): Reference to the groups collection from the DB 
-#         message (dict): dictionary of error messages to be used in case an error occurrs
+    Args:
+        group (Group): Group object to insert to the DB
+        groups (collection): Reference to the groups collection from the DB 
+        message (dict): dictionary of error messages to be used in case an error occurrs
 
-#     """
+    """
 
-#     # Check for an existing group
-#     try:
-#       existing_group = groups.find_one({'name': group.name})
-#     except:
-#       errors["message"] = "Couldn't perform this action. Please try again later"
+    # Check for an existing group
+    try:
+      existing_group = groups.find_one({'name': group.name})
+    except:
+      errors["message"] = "Couldn't perform this action. Please try again later"
     
-#     if existing_group:
-#         errors["message"] = "There already exists an account with this email"
-#         return
+    if existing_group:
+        errors["message"] = "There already exists an account with this email"
+        return
     
-#     # DB insert handler
-#     try:
-#         groups.insert_one(group.to_document())
-#     except:
-#         errors["message"] = "Could not create a Group at the moment. Please make sure the information is correct or try again later."
+    # DB insert handler
+    try:
+        groups.insert_one(group.to_document())
+    except:
+        errors["message"] = "Could not create a Group at the moment. Please make sure the information is correct or try again later."
 
     
-# '''
 # READ user
 
 def get_user(user: User, users: collection):
