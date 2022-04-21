@@ -189,7 +189,7 @@ form i {
 	text-transform: capitalize;
 	font-size: medium;
 	font-style: italic;
-	margin-top: 1rem;
+	margin-top: .5rem;
 }
 
 .login-with-google-btn {
