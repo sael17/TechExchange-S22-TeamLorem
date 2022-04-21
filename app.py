@@ -49,12 +49,12 @@ INDEX route, initial route
 @app.route('/')
 @app.route('/index',methods=["GET","POST"])
 def index():
-    data = posts.find({})
-    result = []
-    for entry in data:
-        result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
-    if result:
-        return render_template('index.html', home_posts=result)
+    # data = posts.find({})
+    # result = []
+    # for entry in data:
+    #     result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+    # if result:
+    #     return render_template('index.html', home_posts=result)
     return render_template('index.html',error='There are no posts available')
 
 

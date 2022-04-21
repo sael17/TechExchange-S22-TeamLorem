@@ -149,7 +149,7 @@ def get_groups(groups: collection):
         groups (collection): Reference to the groups collection from the DB
     """
     try:
-        groups = groups.find()  
+        groups = groups.find()      
     except:
         # TODO:
         print('An exception occurred')
