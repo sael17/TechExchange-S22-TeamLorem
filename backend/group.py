@@ -1,5 +1,6 @@
 from re import split
 from bson import ObjectId
+
 class Group():
     
     def __init__(self, creator: ObjectId, name: str, date_created):

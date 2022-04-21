@@ -1,13 +1,11 @@
-# import 
-
-# class Admin(User):
+# import user
+# class Admin(user.User):
     
-#     def __init__(self):
-#         User.__init__(self,User.email,User.username,User.password)
+#     def __init__(self,email,username,password):
+#         user.User.__init__(self,email,username,password)
 #         self.canModerate = True
 
-#     def __str__(self) -> str:
-#         return super().__str__()
+   
 
         
 

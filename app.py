@@ -1,6 +1,5 @@
 # -- Import section --
 from backend.user import User
-from crypt import methods
 from flask import (
     Flask,
     render_template,
