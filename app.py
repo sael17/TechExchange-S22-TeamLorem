@@ -50,8 +50,8 @@ INDEX route, initial route
 def index():
     if request.method == "POST":
         if request.form["credential"]:
-            doc = request.form["credential"]["payload"]
-            return doc["email"]
+            doc = request.form["credential"]
+            # return doc["email"]
 
 
         # email = verify_credentials()
