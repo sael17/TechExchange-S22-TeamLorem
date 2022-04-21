@@ -77,9 +77,9 @@ class User:
             "email":self.email,
             "username":self.username,
             # uncomment this for testing
-            "password":self.getPW()
+            # "password":self.getPW()
             # comment this for testing
-            # "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt)
+            "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt)
         }
 
 
