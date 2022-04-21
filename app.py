@@ -10,8 +10,6 @@ from flask import (
 )
 
 from flask_pymongo import PyMongo
-from google.oauth2 import id_token
-from google.auth.transport import requests
 import model
 import gunicorn # for heroku deployment
 import secrets
@@ -51,8 +49,11 @@ INDEX route, initial route
 @app.route('/index',methods=["GET","POST"])
 def index():
     if request.method == "POST":
-        email = verify_credentials()
-        return render_template("index.html",error=email)
+        if request.form["credential"]:
+            return request.form["credential"]
+
+        # email = verify_credentials()
+        # return render_template("index.html",error=email)
 
         
 
@@ -67,31 +68,31 @@ def index():
 
 
 
-@app.before_request
-def verify_credentials():
-    if request.form["credential"]:
-            csrf_token_cookie = request.cookies.get('g_csrf_token')
-            if not csrf_token_cookie:
-                return "Error"
-            csrf_token_body = request.get('g_csrf_token')
-            if not csrf_token_body:
-                 return "Error"
-            if csrf_token_cookie != csrf_token_body:
-                 return "Error"
+# @app.before_request
+# def verify_credentials():
+#     if request.form["credential"]:
+#             csrf_token_cookie = request.cookies.get('g_csrf_token')
+#             if not csrf_token_cookie:
+#                 return "Error"
+#             csrf_token_body = request.get('g_csrf_token')
+#             if not csrf_token_body:
+#                  return "Error"
+#             if csrf_token_cookie != csrf_token_body:
+#                  return "Error"
 
-            # (Receive token by HTTPS POST)
+#             # (Receive token by HTTPS POST)
             
-            try:
-                # Specify the CLIENT_ID of the app that accesses the backend:
-                idinfo = id_token.verify_oauth2_token(csrf_token_cookie, requests.Request(), 
-                "578828002560-51agl16hghjdsl9roobutc34cdc4v487.apps.googleusercontent.com")
-                # ID token is valid. Get the user's Google Account ID from the decoded token.
-                userid = idinfo['email']
-                return userid
+#             try:
+#                 # Specify the CLIENT_ID of the app that accesses the backend:
+#                 idinfo = id_token.verify_oauth2_token(csrf_token_cookie, requests.Request(), 
+#                 "578828002560-51agl16hghjdsl9roobutc34cdc4v487.apps.googleusercontent.com")
+#                 # ID token is valid. Get the user's Google Account ID from the decoded token.
+#                 userid = idinfo['email']
+#                 return userid
 
-            except ValueError:
-                # Invalid token
-                pass
+#             except ValueError:
+#                 # Invalid token
+#                 pass
 
 
 
