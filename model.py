@@ -2,10 +2,12 @@ import bcrypt
 from pymongo import collection
 from bson import ObjectId
 from backend.user import User
-from backend.admin import Admin
+# from backend.admin import Admin
 from backend.post import Post
 from backend.group import Group
 
+
+# -- MODEL functions --
 
 '''
 Controller
@@ -38,6 +40,20 @@ def authenticate_user(user:User,users:collection,errors:dict):
             errors["message"] = "Password is incorrect."
     else:
         errors["message"] = "Incorrect User/User does not exist."
+
+
+
+def create_post(author, group, content, date, image):
+    
+    try:
+        post = Post(author, group, content, date, image)
+        return post
+    except TypeError:
+        # TODO: return error message for TypeError
+        pass
+    except ValueError:
+        # TODO: return error message for ValueError
+        pass
 
 
 # -- MONGODB CRUD Functions --

@@ -2,7 +2,7 @@ from re import split
 from bson import ObjectId
 class Group():
     
-    def __init__(self, creator: ObjectId, name: str, date_created: TimeStamp):
+    def __init__(self, creator: ObjectId, name: str, date_created):
         self.creator = creator
         self.name = name
         self._camel_case_name = self.name_to_camel(self.name)
