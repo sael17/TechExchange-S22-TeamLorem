@@ -1,10 +1,14 @@
+from re import split
 from bson import ObjectId
 class Group():
     
     def __init__(self, creator: ObjectId, name: str, date_created: TimeStamp):
         self.creator = creator
         self.name = name
+        self._camel_case_name = self.name_to_camel(self.name)
         self.date_created = date_created
+        
+        # Sets of ObjectIds
         self.users = set()
         self.posts = set()
 
@@ -31,7 +35,14 @@ class Group():
             "date_created":self.date_created
         }
 
-    def _name_to_camel(self):
-    #     ''.join(a.capitalize() for a in split('([^a-zA-Z0-9])', string)
-    #    if a.isalnum())
-        pass
+    def name_to_camel(self, name):
+        
+        # regex to represent ANY character that isn't a letter
+        words = split('([^a-zA-Z])', name)
+        
+        camel = []
+        for word in words:
+            if word.isalpha():
+                camel.append(word.capitalize())
+                
+        return ''.join(camel)        
