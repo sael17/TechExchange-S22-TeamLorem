@@ -84,7 +84,7 @@ def index():
             # return request.form["credential"]
             try:
                 decoded = jwt.decode(request.form["credential"],verify=False)
-                return decoded
+                return decoded["email"]
             except:
                 return "Error"
         
