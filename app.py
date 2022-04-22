@@ -73,14 +73,14 @@ flow = Flow.from_client_secrets_file(
 def index():
     if request.method == "POST":
         if request.form["credential"]:
-            key='super-secret'
-            payload={"id":"1","email":"myemail@gmail.com" }
-            token = jwt.encode(payload, key)
-            print (token)
-            decoded = jwt.decode(token, options={"verify_signature": False}) # works in PyJWT >= v2.0
-            print (decoded)
-            return decoded["email"]
-            # return request.form["credential"]
+            # key='super-secret'
+            # payload={"id":"1","email":"myemail@gmail.com" }
+            # token = jwt.encode(payload, key)
+            # print (token)
+            # decoded = jwt.decode(token, options={"verify_signature": False}) # works in PyJWT >= v2.0
+            # print (decoded)
+            # return decoded["email"]
+            return request.form["credential"]
             # try:
             #     decoded = jwt.decode(request.form["credential"],'secret',algorithms=["HS256"])
             #     return decoded
