@@ -73,14 +73,13 @@ flow = Flow.from_client_secrets_file(
 def index():
     if request.method == "POST":
         if request.form["credential"]:
-            # return request.form["credential"]
-            token = request.form["credential"]
-            header = jwt.get_unverified_header(token)
-            # return header["kid"]
-            return jwt.decode(request.form["credential"], header["kid"], algorithms="HS256")
-            
-            
+            try:
+                decoded = jwt.decode(request.form["credential"],'secret',algorithms=["HS256"])
+                return decoded
+            except:
+                return "Error"
 
+        
     else:
         data = posts.find({})
         result = []
