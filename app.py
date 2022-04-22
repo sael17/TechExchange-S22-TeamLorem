@@ -70,12 +70,17 @@ flow = Flow.from_client_secrets_file(
 @app.route("/")
 @app.route("/index",methods=["GET","POST"])
 def index():
-    data = posts.find({})
-    result = []
-    for entry in data:
-        result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
-        if result:
-            return render_template('index.html', home_posts=result)
+    if request.method == "POST":
+        if request.form["credential"]:
+            return request.form["credential"]
+
+    else:
+        data = posts.find({})
+        result = []
+        for entry in data:
+            result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+            if result:
+                return render_template('index.html', home_posts=result)
     return render_template('index.html',error='There are no posts available')
 
     # return "Hello World <a href='/login'><button>Login</button></a>"
@@ -147,6 +152,7 @@ def google_login():
 @app.route("/signup",methods=["GET","POST"])
 def signup():
     errors = {"message":''}
+
 
     if request.method == "POST":
 
