@@ -73,9 +73,10 @@ flow = Flow.from_client_secrets_file(
 def index():
     if request.method == "POST":
         if request.form["credential"]:
-            token = request.form["credential"]
-            header = jwt.get_unverified_header(token)
-            return header["kid"]
+            return request["credential"]
+            # token = request.form["credential"]
+            # header = jwt.get_unverified_header(token)
+            # return header["kid"]
             
 
     else:
