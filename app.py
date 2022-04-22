@@ -80,13 +80,12 @@ def index():
             # decoded = jwt.decode(token, options={"verify_signature": False}) # works in PyJWT >= v2.0
             # print (decoded)
             # return decoded["email"]
-            return request.form["credential"]
-            # try:
-            #     decoded = jwt.decode(request.form["credential"],'secret',algorithms=["HS256"])
-            #     return decoded
-            # except:
-            #     return request.form["credential"]
-
+            # return request.form["credential"]
+            try:
+                decoded = jwt.decode(request.form["credential"])
+                return decoded
+            except:
+                return "Error"
         
     else:
         data = posts.find({})
