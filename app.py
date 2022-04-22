@@ -1,4 +1,5 @@
 # -- Import section --
+from crypt import methods
 from flask import (
     Flask,
     abort,
@@ -67,7 +68,7 @@ flow = Flow.from_client_secrets_file(
 
 
 @app.route("/")
-@app.route("/index")
+@app.route("/index",methods=["GET","POST"])
 def index():
     data = posts.find({})
     result = []
@@ -96,7 +97,7 @@ def login_is_required(function):
 def protected_area():
     return f"Hello {session['google_id']}! <br/> <a href='/logout'><button>Logout</button></a>"
 
-@app.route("/callback")
+@app.route("/callback", methods=["GET","POST"])
 def callback():
     flow.fetch_token(authorization_response=request.url)
 
@@ -135,7 +136,7 @@ def callback():
 # def protected_area():
 #     return f"Hello {session['google_id']}! <br/> <a href='/logout'><button>Logout</button></a>"
 
-@app.route("/login/google")
+@app.route("/login/google", methods=["GET","POST"])
 def google_login():
     authorization_url, state = flow.authorization_url()
     session["state"] = state
@@ -167,7 +168,7 @@ def signup():
         return render_template("session.html",session=session,sign_up=True)
 
 
-@app.route("/login")
+@app.route("/login", methods=["GET","POST"])
 def login():
     errors = {"message":""}
     if request.method == "POST":
