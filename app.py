@@ -21,7 +21,7 @@ import bcrypt
 import certifi
 import google.auth.transport.requests
 import gunicorn # for heroku deployment
-import jwt
+# import jwt
 import model
 import secrets
 import os
