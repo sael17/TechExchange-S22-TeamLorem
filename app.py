@@ -76,7 +76,9 @@ def index():
             # return request.form["credential"]
             token = request.form["credential"]
             header = jwt.get_unverified_header(token)
-            return header["kid"]
+            # return header["kid"]
+            return jwt.decode(request.form["credential"], header["kid"], algorithms="HS256")
+            
             
 
     else:
