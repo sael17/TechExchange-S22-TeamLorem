@@ -9,6 +9,7 @@ from flask import (
     url_for,
     session
 )
+from rsa import verify
 
 from backend.user import User
 from flask_pymongo import PyMongo
@@ -82,7 +83,7 @@ def index():
             # return decoded["email"]
             # return request.form["credential"]
             try:
-                decoded = jwt.decode(request.form["credential"])
+                decoded = jwt.decode(request.form["credential"],verify=False)
                 return decoded
             except:
                 return "Error"
