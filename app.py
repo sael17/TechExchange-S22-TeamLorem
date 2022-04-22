@@ -21,7 +21,7 @@ import bcrypt
 import certifi
 import google.auth.transport.requests
 import gunicorn # for heroku deployment
-# import jwt
+import jwt
 import model
 import secrets
 import os
@@ -73,10 +73,10 @@ flow = Flow.from_client_secrets_file(
 def index():
     if request.method == "POST":
         if request.form["credential"]:
-            return request.form["credential"]
-            # token = request.form["credential"]
-            # header = jwt.get_unverified_header(token)
-            # return header["kid"]
+            # return request.form["credential"]
+            token = request.form["credential"]
+            header = jwt.get_unverified_header(token)
+            return header["kid"]
             
 
     else:
