@@ -1,6 +1,5 @@
 # -- Import section --
 from base64 import decode
-from crypt import methods
 from flask import (
     Flask,
     abort,
@@ -12,13 +11,17 @@ from flask import (
 )
 from rsa import verify
 
+# -- Classes
 from backend.user import User
+from backend.group import Group
+
 from flask_pymongo import PyMongo
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 from random import randint, random
 
+import datetime
 import bcrypt 
 import certifi
 import google.auth.transport.requests
@@ -54,6 +57,7 @@ app.secret_key = secrets.token_urlsafe(16)
 # Collection References
 users = mongo.db.users
 posts = mongo.db.posts
+groups = mongo.db.groups
 
 # -- GOOGLE API section -- 
 
@@ -187,6 +191,56 @@ def logout():
     session.clear()
     return redirect(url_for("index"))
 
+"""
+ROUTE /groups
+METHODS: GET, POST
+GET: Displays all available groups, or by search
+POST: Creates a group
+"""
+@app.route("/group", methods=['GET', 'POST'])
+def group():
+    errors = {'message':None}
+    
+    if not session.get('username'):
+        return render_template('session.html', session=session, sign_up=False, display=True)
+    
+    if request.method == 'POST':
+        try:
+            new_group = Group.from_document({
+                'name': request.form['group_name'],
+                'about': request.form['about'],
+                'creator': session.get(),
+                'date_created': datetime.datetime.now()
+            })
+        except:
+            errors['message'] = 'Could not read form and/or session data'
+        
+        model.add_group(new_group, groups, errors)
+        
+        return render_template("group.html", session=session,group=new_group.to_document(), errors=errors)
+    else:
+        
+        groups_to_view = model.get_groups(groups)
+        
+        return render_template('groups.html', session=session, groups=groups_to_view)
+
+@app.route('/group/<group_name>')
+def get_group(group_name):
+    
+    if not session.get('username'):
+        return render_template('session.html', session=session, sign_up=False, display=True)
+
+    
+    group_query = Group.from_document({
+        'name': group_name,
+        'creator': 'FOR_QUERY',
+        'about': 'FOR_QUERY',
+        'date_created': 'FOR_QUERY'
+    })
+    
+    group_to_view = model.get_group(group_query, groups)
+    
+    return render_template('group.html', session=session, group=group_to_view)
 
 
 # Old code (sign up)

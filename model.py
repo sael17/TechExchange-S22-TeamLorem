@@ -40,8 +40,7 @@ def authenticate_user(user:User,users:collection,errors:dict):
             errors["message"] = "Password is incorrect."
     else:
         errors["message"] = "Incorrect User/User does not exist."
-
-
+    
 
 def create_post(author, group, content, date, image):
     
@@ -115,7 +114,7 @@ def add_group(group: Group, groups: collection, errors: dict):
       errors["message"] = "Couldn't perform this action. Please try again later"
     
     if existing_group:
-        errors["message"] = "There already exists an account with this email"
+        errors["message"] = f'There already exists a group named "{group.name}"'
         return
     
     # DB insert handler
@@ -170,19 +169,19 @@ def get_groups(groups: collection):
         print('An exception occurred')
     return groups
 
-# def get_group(group: Group, groups: collection):
-#     """Gets a specific group from the DB 
+def get_group(group: Group, groups: collection):
+    """Gets a specific group from the DB by name
 
-#     Args:
-#         group (Group): Group object 
-#         groups (collection): Reference to the groups collection from the DB
-#     """
-#     try:
-#         group = groups.find_one({'name': group.name})
-#     except:
-#         # TODO:
-#         print('An exception occurred')
-#     return group 
+    Args:
+        group (Group): Group object 
+        groups (collection): Reference to the groups collection from the DB
+    """
+    try:
+        group = groups.find_one({'name': group.name})
+    except:
+        # TODO:
+        print('An exception occurred')
+    return group 
 
 def get_group_by_id(id: ObjectId, groups: collection):
     """Gets a specific group from the DB by its id
