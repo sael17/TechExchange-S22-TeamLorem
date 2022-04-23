@@ -143,7 +143,7 @@ def signup():
             session["username"] = request.form["username"]
             return redirect(url_for("index"))
     else:
-        return render_template("session.html",session=session,sign_up=True)
+        return render_template("session.html",session=session,sign_up=True,display=True)
 
 
 @app.route("/login", methods=["GET","POST"])
@@ -174,7 +174,7 @@ def login():
     else:
         if session.get('username'):
             return redirect(url_for('index'))
-    return render_template("session.html", session=session,sign_up=False)
+    return render_template("session.html", session=session,sign_up=False,display=True)
 
 """
 Method that allows the user to logout their account from the page's current session
