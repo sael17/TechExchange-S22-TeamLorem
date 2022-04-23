@@ -137,7 +137,7 @@ def signup():
 
         if errors["message"]:
             return render_template("session.html",session=session,
-            error_message=errors["message"],sign_up = True)
+            error_message=errors["message"],sign_up=True,display=True)
 
         else:
             session["username"] = request.form["username"]
@@ -165,7 +165,7 @@ def login():
 
         if errors["message"]:
             return render_template("session.html",session=session,
-            error_message=errors["message"],sign_up=False)
+            error_message=errors["message"],sign_up=False,display=True)
 
         else:
             session['username'] = user_to_authenticate.username
