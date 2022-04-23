@@ -104,14 +104,15 @@ def google_login():
                 decoded_username = decoded_email[:decoded_email.find("@")+1] + str(randint(1,100))
 
                 return render_template("session.html",session=session,sign_up = True, google_signup = True,
-        google_email=decoded_email,username=decoded_username)
+                display=False, google_email=decoded_email,username=decoded_username)
 
 
             except:
                 return "Error"        
     
     else:
-        return render_template("session.html",session=session,sign_up = True, google_signup = True)
+        return render_template("session.html",session=session,sign_up = True, google_signup = True, 
+        display=True)
 
 
     # authorization_url, state = flow.authorization_url()
