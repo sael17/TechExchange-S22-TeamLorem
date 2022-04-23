@@ -91,10 +91,10 @@ def index():
                 return render_template('index.html', home_posts=result)
     return render_template('index.html',error='There are no posts available')
 
-# -- GOOGLE API Routes -- 
 
-@app.route("/login/google", methods=["GET","POST"])
-def google_login():
+# -- GOOGLE API Routes -- 
+@app.route("/signup/google", methods=["GET","POST"])
+def google_signup():
     if request.method == "POST":
         if request.form["credential"]:
             # return request.form["credential"]
@@ -103,21 +103,37 @@ def google_login():
                 decoded_email = decoded["email"]
                 decoded_username = decoded_email[:decoded_email.find("@")+1] + str(randint(1,100))
 
-                return render_template("session.html",session=session,sign_up = True, google_signup = True,
-                display=False, google_email=decoded_email,username=decoded_username)
+                return render_template("session.html",session=session,sign_up = True, 
+                google_signup = True, display=False, google_email=decoded_email,username=decoded_username)
 
 
             except:
-                return "Error"        
+                return render_template("session.html",session=session,sign_up = True, 
+                google_signup = True, display=True,error_message="Something Went Wrong")        
     
     else:
-        return render_template("session.html",session=session,sign_up = True, google_signup = True, 
+        return render_template("session.html",session=session,sign_up = True, 
+        google_signup = True, display=True)
+
+@app.route("/login/google",methods=["GET","POST"])
+def google_login():
+    if request.method == "POST":
+        if request.form["credential"]:
+            try:
+                decoded = jwt.decode(request.form["credential"],verify=False)
+                decoded_email = decoded["email"]
+                return render_template("session.html",session=session,sign_up = False, 
+                google_signup = True, display=False, google_email=decoded_email)
+
+
+            except:
+                return render_template("session.html",session=session,sign_up = False, 
+                google_signup = True, display=True, error_message="Something Went Wrong.")
+    else:
+        return render_template("session.html",session=session,sign_up = False, google_signup = True, 
         display=True)
+            
 
-
-    # authorization_url, state = flow.authorization_url()
-    # session["state"] = state
-    # return redirect(authorization_url)
 
 
 # -- Normal Routes -- 
