@@ -159,7 +159,7 @@ def login():
 
         except ValueError:
             return render_template("session.html",error_message="Password is incorrect",
-            sign_up=False)
+            sign_up=False,display=True)
 
         model.authenticate_user(user_to_authenticate,users,errors)
 
