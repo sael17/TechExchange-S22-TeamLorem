@@ -2,6 +2,7 @@
 from backend.user import User
 from flask import (
     Flask,
+    jsonify,
     render_template,
     request,
     redirect,
@@ -39,6 +40,7 @@ app.secret_key = secrets.token_urlsafe(16)
 # Collection References
 users = mongo.db.users
 posts = mongo.db.posts
+test_groups = mongo.db.test_group
 
 # -- Routes section --
 
@@ -219,6 +221,18 @@ def logout():
     session.clear()
     return redirect(url_for("index"))
 
+
+@app.route("/groups")
+def groups():
+    group_info = test_groups.find_one({})
+    group_posts = posts.find({'group': group_info['_id']})
+    result = []
+    for post in group_posts:
+        print(post)
+        result.append(model.create_post(author = post['author'], group = group_info['group_name'], content = post['content'], date = post['date'], image = post['group_image']))
+    if result:
+        return render_template('groups.html', posts=result)
+    return 'The are no posts available'
 
 
 
