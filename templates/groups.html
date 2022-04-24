@@ -1,0 +1,69 @@
+{% extends 'main.html' %}
+
+{% block styles %}
+<link rel="stylesheet" href="static/css/groups.css">
+{% endblock %}
+
+
+{% block content %}
+<main>
+    <h1>GROUPS</h1>
+
+    <!-- Button to toggle display for #create-group-form  -->
+    <button class="btn" onclick="toggleForm(this)"><h2>Create a Group +</h2></button>
+
+    <div class="container" id="create-group-form">
+        <form action="/group" method="post">
+            <h3 class="create-group-title">Create a GoalUP Group</h3>
+            <div class="mb-3">
+                <label for="group-name" class="form-label" oninput="updateName(this)">Group Name</label>
+                <input type="text" class="form-control group-name" id="group-name" name="group-name" placeholder="">
+              </div>
+              <div class="mb-3">
+                <label for="group-info" class="form-label">Group Information</label>
+                <textarea class="form-control group-info" id="group-info" name="group-info" rows="3" placeholder="What is your GoalUP group about?"></textarea>
+              </div>              
+        </form>
+    </div>
+
+    <div class="groups-container">
+        {% for group in groups%}
+        <div class="container mt-3">
+            <a class="btn group-name" href="/group/{{ group.name }}"><h2>{{group.name}}</h2></a>
+            <p class="group-info" >{{ group.about }}</p>
+            <p class="group-creator">by: {{ group.creator }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+
+<script>
+    function toggleForm(e) {
+        const form = document.getElementById("create-group-form");
+
+        if (form.style.display === "block") {
+            form.style.display = "none";
+            e.innerHTML = "<h2>Create a Group +</h2>"
+        } 
+        else {
+            form.style.display = "block";
+            e.innerHTML = "<h2><- Back</h2>"
+        }
+      }
+      
+    //function updateName(e) {
+    //    let text = e.value
+    //    if (text === " ") {
+    //        text = ""
+    //    }
+    //    else if (!text.endsWith("- ") && text.endsWith(" ")) {
+    //       text = text.trim()
+    //        text = text + "-"
+    //    }
+    //    e.value = text
+
+    //}
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,13 @@
+{% extends 'main.html' %}
+
+{% block styles %}
+<link rel="stylesheet" href="static/css/groups.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-3">
+    <h2 class="group-name">{{ group.name }}</h2>
+    <p class="group-info">{{ group.about }}</p>
+    <p class="group-creator">by: {{ group.creator }}</p>
+</div>
+{% endblock %}
