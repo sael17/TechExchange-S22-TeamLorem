@@ -64,6 +64,7 @@ app.secret_key = secrets.token_urlsafe(16)
 users = mongo.db.users
 posts = mongo.db.posts
 groups = mongo.db.groups
+test_groups = mongo.db.test_group
 
 # -- GOOGLE API section -- 
 
