@@ -1,3 +1,17 @@
+/* Basic Color Palette for Website */
+
+:root{
+    --color-primary: #FFBF69;
+    --color-secondary: #CBF3F0;
+
+    --color-primary-dark:#FF9F1C;
+    --color-secondary-dark: #2bbbb0;
+    
+    --color-white: #FFFFFF;
+    --color-black: #000;
+}
+
+
 /* Groups Container */
 
 /* .group-container {
@@ -25,34 +39,30 @@ a.group-name:hover {
 
 /* Create a Group */
 
+.toggle-form-btn {
+    background-color: var(--color-primary-dark);
+}
+
 #create-group-form {
-    display: none;
+    margin:1rem auto;
+    /* display: none; */
 }
 
 /* MISC */
-/* Basic Color Palette for Website */
 
-:root{
-    --color-primary: #FFBF69;
-    --color-secondary: #CBF3F0;
-
-    --color-primary-dark:#FF9F1C;
-    --color-secondary-dark: #2bbbb0;
-    
-    --color-white: #FFFFFF;
-    --color-black: #000;
-}
-
-textarea.post-input {
-    width: 100%;
-    border: 0px;
-    outline: 0px;
+/* Input */
+textarea.post-input, textarea.group-info, .group-name-input {
+    width: 100% !important;
+    border: 0px !important;
+    outline: 0px !important;
     resize: none !important;
-    background: transparent;
-    padding: 2%;
-    border-radius: 15px 50px;
-    margin: auto;
+    background: var(--color-primary-dark) !important;
+    padding: 2% !important;
+    border-radius: 15px 50px !important;
+    margin: auto !important;
 }
+
+
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: black;
