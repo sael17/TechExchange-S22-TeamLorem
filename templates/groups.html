@@ -1,11 +1,12 @@
 {% extends "main.html" %}
 
-{% block styles%}
+{% block styles %}
 <link rel="stylesheet" href="/static/css/posts.css">
+<link rel="stylesheet" href="/static/css/groups.css">
 {% endblock %}
 
 {% block content %}
-{% for post in home_posts%}
+{% for post in posts%}
 <div class="container mt-3">
     <div class="row">
         <div class="col-2 m-auto group-info">
@@ -20,4 +21,16 @@
     </div>
 </div>
 {% endfor %}
+
+{% if active %}
+<!-- TODO: render this only if the user is logged in -->
+<!-- TODO: add validation for text area -->
+<div class="container mt-3">
+    <form action="/group" method="post">
+        <textarea name="content" rows="8" placeholder="What's on you mind today?"></textarea>
+        <button type="submit" class="btn btn-style mb-3">Add Post</button>
+    </form>
+</div>
+{% endif %}
+
 {% endblock %}

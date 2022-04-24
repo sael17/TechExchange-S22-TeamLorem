@@ -1,0 +1,35 @@
+/* Basic Color Palette for Website */
+
+:root{
+    --color-primary: #FFBF69;
+    --color-secondary: #CBF3F0;
+
+    --color-primary-dark:#FF9F1C;
+    --color-secondary-dark: #2bbbb0;
+    
+    --color-white: #FFFFFF;
+    --color-black: #000;
+}
+
+textarea{
+    width: 100%;
+    border: 0px;
+    outline: 0px;
+    resize: none !important;
+    background: transparent;
+    padding: 2%;
+    border-radius: 15px 50px;
+    margin: auto;
+}
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+    color: black;
+    opacity: 1; /* Firefox */
+}
+
+.btn-style{
+    display: flex !important;
+    margin: auto;
+    background-color: var(--color-secondary-dark)!important;
+    /* color: white !important; */
+}

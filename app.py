@@ -1,6 +1,8 @@
 # -- Import section --
 from base64 import decode
 from crypt import methods
+from pickle import FALSE
+from time import time
 from flask import (
     Flask,
     abort,
@@ -18,6 +20,9 @@ from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 from random import randint, random
+from datetime import date
+from backend.post import Post
+from bson import ObjectId
 
 import bcrypt 
 import certifi
@@ -413,3 +418,50 @@ def delete_account():
         if session.get('username'):
             return redirect(url_for('login'))
         return render_template("account.html")
+#TODO - If there are no posts and the user is not logged in it shows up blank, handle this edge case
+@app.route("/group", methods=['GET', 'POST'])
+def group():
+    # if request method == post 
+    # collect data from post
+    # add to db 
+    # render all the posts in the db
+    # else display the current posts inside the db
+
+    #TODO get author from the session
+    is_active = False
+    current_user = session.get('username')
+    # even though usernames are unique we use find one because if not it returns a cursor object
+    author = users.find_one({'username':current_user})
+    if author:
+        is_active = True
+
+    if request.method == 'POST':
+        #TODO get group from session
+        group = ObjectId('6261acca285a88b547479b78')
+        content = request.form['content']
+        time = date.today().strftime("%B %d, %Y")
+        #TODO get image from session
+        image = 'https://imageio.forbes.com/blogs-images/forbestechcouncil/files/2019/01/canva-photo-editor-8-7.jpg?fit=bounds&format=jpg&width=960'
+
+        #create post
+        new_post = Post(author=author['_id'],group=group,content=content,date=time,image=image)
+        posts.insert_one({'author':new_post.author,'group':new_post.group,'content':new_post.content,'date':new_post.date,'group_image':new_post.image})
+
+        group_info = test_groups.find_one({})
+        group_posts = posts.find({'group': group_info['_id']})
+        result = []
+        for post in group_posts:
+            author_name = users.find_one({'_id':post['author']})
+            result.append(model.create_post(author = author_name['username'], group = group_info['group_name'], content = post['content'], date = post['date'], image = post['group_image']))
+    
+        if result:
+            return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
+
+    else:
+        group_info = test_groups.find_one({})
+        group_posts = posts.find({'group': group_info['_id']})
+        result = []
+        for post in group_posts:
+            author_name = users.find_one({'_id':post['author']})
+            result.append(model.create_post(author = author_name['username'], group = group_info['group_name'], content = post['content'], date = post['date'], image = post['group_image']))
+        return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
