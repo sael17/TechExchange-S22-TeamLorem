@@ -135,7 +135,6 @@ def google_login():
             
 
 
-
 # -- Normal Routes -- 
 @app.route("/signup",methods=["GET","POST"])
 def signup():
@@ -251,4 +250,155 @@ def logout():
     #             error_message="User does not exist",signup=False)
     # else:
     #     return render_template("session.html",session=session,signup=False)
+
+
+"""
+Allows the user to reset or change their current password to a new one
+For now, the only validation is the username since these are unique
+More validation is needed for the future
+
+Returns:
+    If sucessful, returns user to login page, else the user made a mistake
+    (user not found) and it throws an error for the user to see
+"""
+@app.route("/resetpw",methods=["GET","POST"])
+def resetpw():
+    # get users db
+    users = mongo.db.users
+    if request.method == "GET":
+        return render_template("changepw.html", session=session)
+    else:
+        # update old password with new password
+        current_user = users.find_one({"username":session["username"]})
+        if users.find_one({"username":session["username"]}):
+            current_user = session["username"]
+            username = request.form["username"]
+            if current_user == username:
+                # obtain new password and encrypt it for security reasons
+                password = request.form['password'].encode('utf-8')
+                salt = bcrypt.gensalt()
+                hashed_pasword = bcrypt.hashpw(password, salt)
+                # set the new value of the password
+                newvalue = {"$set": { "password": hashed_pasword }}
+                # update user's old password with new password
+                users.update_one({"username":username}, newvalue)
+                # go back to index page
+                return redirect("/login")
+            else:
+                return render_template("changepw.html",session=session,error_message="Inccorect User")
+        else:
+            return render_template("changepw.html", session=session, error_message="Username not Correct")
+            # return render_template("login.html", error_message="Username is incorrect")
+
+
+"""
+Allows the user to modify their account and profile and the option to delete
+their account and connect to different platforms
+
+Returns:
+    JinjaTemplate: renders the same page again with all the changed made present.
+    It can also redirect to delete the account.
+"""
+@app.route("/account", methods=["GET","POST"])
+# this router shall be only available if a user is logged in
+def account():
+    # get the user from the db
+    users = mongo.db.users
+    # save the current user to modify its info
+    current_user = session['username']
+    # save the document from the DB that represents the current user in the page
+    user_doc = users.find_one({"username":current_user})
+
+    if request.method =="POST":
+
+        try:
+            option = request.form["delete"]
+            if option == "yes":
+                return redirect("/delete-account")
+        except:
+            pass
+        
+        # get the input firstname from the form in order to update it
+        new_firstname = {"$set":{"firstname":request.form["firstname"]}}
+        users.update_one({"username":current_user},new_firstname)
+
+        # get the input lastame from the form in order to update it
+        new_lastname = {"$set":{"lastname":request.form["lastname"]}}
+        users.update_one({"username":current_user},new_lastname)
+
+        # get the input bio from the form in order to update it
+        new_bio = {"$set":{"bio":request.form["bio"]}}
+        users.update_one({"username":current_user},new_bio)
+
+        user_doc = users.find_one({"username":current_user})
+
+        # return render_template("account.html", session=session,firstname=user_doc["firstname"],
+        # lastname=user_doc["lastname"],bio=user_doc["bio"],
+        # password=model.hashed_to_star(user_doc["password"]))
+    
+    
+
+    # load account info with the one prev found in the user's document
+    try:
+        return render_template("account.html", session=session,
+        firstname=user_doc["firstname"],lastname=user_doc["lastname"],
+        bio=user_doc["bio"],password=model.hashed_to_star(user_doc["password"]),
+        email=user_doc["email"])
+    except:
+        return render_template("account.html",firstname="",lastname="",bio="",
+        password="******",session=session)
+
+"""
+Delete the users account from the users data base 
+
+Redirects to the logout where the account is also cleared from the current session
+and it is redirected to the main page (index.html)
+"""
+@app.route("/delete-account",methods=["GET","POST"])
+def delete_account():
+    if request.method == "POST":
+        users = mongo.db.users
+        users.delete_one({"username":session["username"]})
+        return redirect("/logout")
+    else:
+        if session.get('username'):
+            return redirect(url_for('login'))
+        return render_template("account.html")
+
+"""
+Allows the user to change their current email to a new one
+For now, the only validation is the username since these are unique
+More validation is needed for the future
+
+Returns:
+    If sucessful, returns user to login page, else the user made a mistake
+    (user not found) and it throws an error for the user to see
+"""
+@app.route("/change-email",methods=["GET","POST"])
+def change_email():
+    # get users db
+    users = mongo.db.users
+    if request.method == "GET":
+        return render_template("changeemail.html", session=session)
+    else:
+        # update old password with new password
+        current_user = users.find_one({"username":session["username"]})
+        if users.find_one({"username":session["username"]}):
+            current_user = users.find_one({"username":session["username"]})
+            username = request.form["username"]
+            if current_user["username"] == username:
+                new_email = request.form["email"]
+                # set the new value of the password
+                newvalue = {"$set": { "password": new_email }}
+                # update user's old password with new password
+                users.update_one({"username":username}, newvalue)
+                # go back to index page
+                return redirect("/login")
+            else:
+                return render_template("changeemail.html", session=session, error_message="Incorrect User")
+        else:
+            return render_template("changeemail.html", session=session, error_message="Username not found")
+
+
+
     
