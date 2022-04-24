@@ -4,7 +4,7 @@ import re
 
 # Make a regular expression
 # for validating an Email
-regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+# regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
 
 class User:
 
@@ -28,8 +28,8 @@ class User:
         if len(username) < 6 or len(username) > 16:
             raise ValueError("Username must be greater than 6 but less than 16 characters")
 
-        if not re.fullmatch(regex,email):
-            raise ValueError("Email must be a valid format")
+        # if not re.fullmatch(regex,email):
+        #     raise ValueError("Email must be a valid format")
 
         if password == "" or password.isspace():
             raise ValueError("Password can not be empty")

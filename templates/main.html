@@ -7,7 +7,7 @@
 
     <!-- CSS Styles Links -->
     <link rel="stylesheet" href="/static/css/style.css">
-    
+    <!-- template styles -->
     {% block styles %}
     {% endblock %}
 
@@ -41,16 +41,29 @@
                             <a class="nav-link active" aria-current="page" href="#">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">About Us</a>
+                            <a class="nav-link" href="/group">Find Groups</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
-                                Account
+                                {% if session.username %}
+                                    <i>{{ session.username }}</i>
+                                {% else %}
+                                    Account
+                                {% endif %}
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="/signup">Sign Up</a></li>
-                                <li><a class="dropdown-item" href="/login">Log In</a></li>
+                                {% if session.username %}
+                                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                                    <li>
+                                        <hr class="dropdown-divider">
+                                    </li>
+                                    <li><a class="dropdown-item" href="/logout">Log out</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item" href="/signup">Sign Up</a></li>
+                                    <li><a class="dropdown-item" href="/login">Log In</a></li>
+                                {% endif %}
+
                                 <!-- <li>
                                     <hr class="dropdown-divider">
                                 </li>
@@ -67,7 +80,8 @@
 
     <!-- Main Content of the Page -->
     <main>
-        {% block content %}{% endblock %}
+        {% block content %}
+        {% endblock %}
     </main>
 
     <!-- Footer of the Page -->
