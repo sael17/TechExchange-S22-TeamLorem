@@ -18,12 +18,21 @@
                 <h2 class="account-section">Account</h2>
                 <div class="row profilepic-row">    
                     <div class="profilepic">
+                        {%if profile_pic%}
+                        <img class="profilepic__image" src={{profile_pic}} 
+                            width="150" 
+                            height="150" 
+                            alt="Profibild">
+                        {%else%}
                         <img class="profilepic__image"
                             src="/static/img/code.jpeg"
-                            width="150" height="150" alt="Profibild"/>
+                            width="150" 
+                            height="150" 
+                            alt="Profibild">
+                        {%endif%}
                         <div class="profilepic__content">
                             <span class="profilepic__icon"><i class="fas fa-camera"></i></span>
-                            <span class="profilepic__text"><a href="/change-profile-pic">Change Photo</a></span>
+                            <span class="profilepic__text"><a href="/change/profilepic">Change Photo</a></span>
                         </div>
                     </div>
                 </div>
@@ -33,19 +42,32 @@
                         <div class="first-lastnames">
                             <label class="firstname" for="firstname">First Name</label>
                             <div class="firstname-input">
+                                {%if firstname%}
+                                <input type="text" class="loggedin" name="firstname" value={{firstname}}>
+                                {%else%}
                                 <input type="text" class="loggedin" name="firstname" placeholder="First Name">
+                                {%endif%}
                             </div>
 
                             <label clssname="password-label" for="lastname">Last Name</label>
                             <div class="lastname-input">
+                                {%if lastname%}
+                                <input type="text" class="loggedin" name="lastname" value={{lastname}}>
+                                {%else%}
                                 <input type="text" class="loggedin" name="lastname" placeholder="Last Name">
+                                {%endif%}
                             </div>
                         </div>
 
                         <div class="textarea-container">
                             <label class="bio" id="textbox-label" for="bio">Your Bio</label>
+                            {%if bio%}
                             <textarea class="textbox" name="bio" rows="10" spellcheck="true" wrap="hard" maxlength="140"
-                                placeholder="Add a bio"></textarea>
+                            >{{bio}}</textarea>
+                            {%else%}
+                            <textarea class="textbox" name="bio" rows="10" spellcheck="true" wrap="hard" maxlength="140"
+                            placeholder="Add a bio"></textarea>
+                            {%endif%}
                             <span id="textbox-span"><sup>*</sup>0/140 characters</span>
                         </div>
                         <input id="submit-input" class="btn" type="submit" value="Save">
@@ -59,20 +81,28 @@
                 <div class="row account-row">
                     <div class="user-info">
                         <h5 class="account-h5">Your email</h5>
+                        {%if email%}
+                        <span class="account-info-span">{{email}}</span>
+                        {%else%}
                         <span class="account-info-span">john.doe@techexchange.in</span>
-                        <button class="account-info-btn btn"><a class="change-link" href="/change-email">Change</a></button>
+                        {%endif%}
+                        <button class="account-info-btn btn"><a class="change-link" href="/change/email">Change</a></button>
                     </div>
 
                     <div class="user-info">
                         <h5 class="account-h5">Your username</h5>
+                        {%if username%}
+                        <span class="account-info-span">{{username}}</span>
+                        {%else%}
                         <span class="account-info-span">sael@17</span>
-                        <button class="account-info-btn btn"><a class="change-link" href="/change-username">Change</a></button>
+                        {%endif%}
+                        <button class="account-info-btn btn"><a class="change-link" href="/change/username">Change</a></button>
                     </div>
                     
                     <div class="user-info">
                         <h5 class="account-h5">Your Password</h5>
-                        <span class="account-info-span">*******</span>
-                        <button class="account-info-btn btn"><a class="change-link" href="/change-password">Change</a></button>
+                        <span class="account-info-span">*********</span>
+                        <button class="account-info-btn btn"><a class="change-link" href="/change/password">Change</a></button>
                     </div>
 
                     <div class="delete-account">
@@ -85,30 +115,25 @@
             <div class="col">
                 <h2 class="account-section account-section-posts">Your Posts</h2>
                 <div class="col posts-col">
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
-                    <div class="row">Post</div>
+                    {%if posts%}
+                    {% for post in posts%}
+                    <div class="container mt-3">
+                        <div class="row">
+                            <div class="col-2 m-auto group-info">
+                                <img src="{{ post.image }}" alt="post-img">
+                                <p>{{post.group }}</p>
+                            </div>
+                            <div class="col-md-10 post-content">
+                                <h2>{{ post.author }}</h2>
+                                <p>{{ post.content }}</p>
+                                <p class="date">{{ post.date }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {%else%}
+                    <div class="row">Create A Post in one of your social groups!</div>
+                    {%endif%}
                 </div>
 
                 <div class="row">
@@ -126,27 +151,10 @@
                             </div>
                         </div>
                         
-                    </div>
-                    
+                    </div> 
                 </div>
                  
             
-
-                <!-- {% for post in posts%}
-                <div class="container mt-3">
-                    <div class="row">
-                        <div class="col-2 m-auto group-info">
-                            <img src="{{ post.image }}" alt="post-img">
-                            <p>{{ post.group }}</p>
-                        </div>
-                        <div class="col-md-10 post-content">
-                            <h2>{{ post.author }}</h2>
-                            <p>{{ post.content }}</p>
-                            <p class="date">{{ post.date }}</p>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %} -->
             </div>
             
         </div>
