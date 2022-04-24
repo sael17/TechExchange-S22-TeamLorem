@@ -6,31 +6,32 @@
 {% endblock %}
 
 {% block content %}
-{% for post in posts%}
-<div class="container mt-3">
-    <div class="row">
-        <div class="col-2 m-auto group-info">
-            <img src="{{ post.image }}" alt="post-img">
-            <p>{{ post.group }}</p>
-        </div>
-        <div class="col-md-10 post-content">
-            <h2>{{ post.author }}</h2>
-            <p>{{ post.content }}</p>
-            <p class="date">{{ post.date }}</p>
-        </div>
-    </div>
-</div>
-{% endfor %}
 
 {% if active %}
 <!-- TODO: render this only if the user is logged in -->
 <!-- TODO: add validation for text area -->
 <div class="container mt-3">
-    <form action="/group" method="post">
+    <form action="{{ url_for('group') }}" method="post">
         <textarea name="content" rows="8" placeholder="What's on you mind today?"></textarea>
         <button type="submit" class="btn btn-style mb-3">Add Post</button>
     </form>
 </div>
 {% endif %}
+
+{% for post in posts%}
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-lg-2 col-md-12 col-sm-12 col-xs-12 m-auto group-info">
+            <img src="{{ post.image }}" alt="post-img">
+            <p>{{ post.group }}</p>
+        </div>
+        <div class="col-lg-10 col-md-12 col-sm-12 col-xs-12 post-content">
+            <p class="date">{{ post.date }}</p>
+            <h2>{{ post.author }}</h2>
+            <p>{{ post.content }}</p>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 {% endblock %}

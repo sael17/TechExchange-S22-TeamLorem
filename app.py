@@ -92,7 +92,9 @@ def index():
         data = posts.find({})
         result = []
         for entry in data:
-            result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+            author_name = users.find_one({'_id':entry['author']})
+            #TODO - get group name from group db
+            result.append(model.create_post(author = author_name['username'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
             if result:
                 return render_template('index.html', home_posts=result)
     return render_template('index.html',error='There are no posts available')
@@ -139,8 +141,6 @@ def google_login():
         return render_template("session.html",session=session,sign_up = False, google_signup = True, 
         display=True)
             
-
-
 
 # -- Normal Routes -- 
 @app.route("/signup",methods=["GET","POST"])
@@ -271,8 +271,8 @@ def group():
     is_active = False
     current_user = session.get('username')
     # even though usernames are unique we use find one because if not it returns a cursor object
-    author = users.find_one({'username':current_user})
-    if author:
+    if current_user:
+        author = users.find_one({'username':current_user})
         is_active = True
 
     if request.method == 'POST':
@@ -284,14 +284,15 @@ def group():
         image = 'https://imageio.forbes.com/blogs-images/forbestechcouncil/files/2019/01/canva-photo-editor-8-7.jpg?fit=bounds&format=jpg&width=960'
 
         #create post
-        new_post = Post(author=author['_id'],group=group,content=content,date=time,image=image)
-        posts.insert_one({'author':new_post.author,'group':new_post.group,'content':new_post.content,'date':new_post.date,'group_image':new_post.image})
+        new_post = Post(author=author['_id'], group=group, content=content, date=time, image=image)
+        posts.insert_one({'author':new_post.author, 'group':new_post.group, 'content':new_post.content, 'date':new_post.date, 'group_image':new_post.image})
 
+        #TODO
         group_info = test_groups.find_one({})
         group_posts = posts.find({'group': group_info['_id']})
         result = []
         for post in group_posts:
-            author_name = users.find_one({'_id':post['author']})
+            author_name = users.find_one({'_id': post['author']})
             result.append(model.create_post(author = author_name['username'], group = group_info['group_name'], content = post['content'], date = post['date'], image = post['group_image']))
     
         if result:
