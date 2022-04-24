@@ -305,7 +305,7 @@ def post():
       
     author_id = model.get_user(user, users)['_id']
     content = request.form['content']
-    time = date.today() #.strftime("%B %d, %Y")
+    time = datetime.datetime.now()
     
     new_post = Post.from_document({
         'author': author_id,
@@ -317,6 +317,7 @@ def post():
     
     model.create_post(new_post, posts, errors)
     
+    print(errors['message'])
     # TODO: error handling
     
     return redirect(url_for('get_group', group_name=group_name))

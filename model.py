@@ -88,6 +88,7 @@ def create_post(post: Post, posts: collection, errors: dict):
         errors (dict): _description_
     """
     
+    print(post.to_document())
     try:
         posts.insert_one(post.to_document())
     except:
@@ -196,7 +197,7 @@ def get_posts_from_user(user: User, users: collection, posts: collection, errors
     except:
         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
     
-    return user_id
+    return user_posts
 
 
 def get_posts(posts: collection):
