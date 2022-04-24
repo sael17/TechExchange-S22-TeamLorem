@@ -40,20 +40,6 @@ def authenticate_user(user:User,users:collection,errors:dict):
             errors["message"] = "Password is incorrect."
     else:
         errors["message"] = "Incorrect User/User does not exist."
-    
-
-def create_post(author, group, content, date, image):
-    
-    try:
-        post = Post(author, group, content, date, image)
-        return post
-    except TypeError:
-        # TODO: return error message for TypeError
-        pass
-    except ValueError:
-        # TODO: return error message for ValueError
-        pass
-
 
 # -- MONGODB CRUD Functions --
 
@@ -93,10 +79,36 @@ def add_user(user:User,users:collection,errors:dict):
 CREATE post
 '''
 
+def create_post(post: Post, posts: collection, errors: dict):
+    """Adds a post to the posts collection in the DB
+
+    Args:
+        post (Post): _description_
+        posts (collection): _description_
+        errors (dict): _description_
+    """
+    
+    try:
+        posts.insert_one(post.to_document())
+    except:
+        errors["message"] = "Could not create a Post at the moment."
+
+# def create_post_instance(author, group, content, date, image):
+    
+#     try:
+#         post = Post(author, group, content, date, image)
+#         return post
+#     except TypeError:
+#         # TODO: return error message for TypeError
+#         pass
+#     except ValueError:
+#         # TODO: return error message for ValueError
+#         pass
 
 '''
 CREATE group
 '''
+
 def add_group(group: Group, groups: collection, errors: dict):
     """Adds a Group to the group collection in the DB
 
@@ -124,7 +136,9 @@ def add_group(group: Group, groups: collection, errors: dict):
         errors["message"] = "Could not create a Group at the moment. Please make sure the information is correct or try again later."
 
     
-# READ user
+"""
+READ user
+"""
 
 def get_user(user: User, users: collection):
     try:
@@ -152,6 +166,56 @@ def get_user_by_id(id: ObjectId, users: collection):
 '''
 READ post
 '''
+# def get_posts_from_group(group: Group, posts: collection, errors: dict):
+    
+#     group_posts = []
+#     try:
+#         post_ids = group.posts # collection of posts IDs
+#         for post_id in post_ids:
+#             group_posts.append(posts.find_one({'_id':post_id}))
+#     except:
+#         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
+    
+#     return group_posts
+
+# Alternate method
+def get_posts_from_group(group: Group, groups:collection, posts: collection, errors: dict):
+    try:
+        group_name = get_group(group, groups)['name']
+        group_posts = posts.find({'group': group_name})
+    except:
+        errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
+        
+    return group_posts
+
+def get_posts_from_user(user: User, users: collection, posts: collection, errors: dict):
+    
+    try:
+        user_id = get_user(user, users)['_id']
+        user_posts =  posts.find({'author': user_id})
+    except:
+        errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
+    
+    return user_id
+
+
+def get_posts(posts: collection):
+    
+    try:
+        posts_docs = posts.find()
+    except:
+        # TODO:
+        print('An exception occurred')
+    return posts_docs
+
+def get_post_by_id(id: ObjectId, posts: collection):
+    
+    try:
+        post = posts.find_one({'_id': id})
+    except:
+        print('An exception occurred')
+    
+    return post
 
 '''
 READ group
@@ -208,6 +272,13 @@ UPDATE post
 '''
 UPDATE group
 '''
+def update_posts_from_group(group: Group, post: Post, groups: collection, posts: collection, errors: dict):
+    
+    try:
+        post_to_group = get_post
+        
+    except:
+        print('An exception occurred')
 
 '''
 DELETE user

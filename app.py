@@ -1,5 +1,8 @@
 # -- Import section --
 from base64 import decode
+# from crypt import methods
+from pickle import FALSE
+from time import time
 from flask import (
     Flask,
     abort,
@@ -14,12 +17,15 @@ from rsa import verify
 # -- Classes
 from backend.user import User
 from backend.group import Group
+from backend.post import Post
 
 from flask_pymongo import PyMongo
 from google.oauth2 import id_token
 from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 from random import randint, random
+from datetime import date
+from bson import ObjectId
 
 import datetime
 import bcrypt 
@@ -87,18 +93,19 @@ def index():
                 return "Error"
         
     else:
-        data = posts.find({})
+        data = model.get_posts(posts)
         result = []
         for entry in data:
-            result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+            # result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
+            result.append(Post.from_document(entry))
             if result:
                 return render_template('index.html', home_posts=result)
     return render_template('index.html',error='There are no posts available')
 
-# -- GOOGLE API Routes -- 
 
-@app.route("/login/google", methods=["GET","POST"])
-def google_login():
+# -- GOOGLE API Routes -- 
+@app.route("/signup/google", methods=["GET","POST"])
+def google_signup():
     if request.method == "POST":
         if request.form["credential"]:
             # return request.form["credential"]
@@ -107,21 +114,37 @@ def google_login():
                 decoded_email = decoded["email"]
                 decoded_username = decoded_email[:decoded_email.find("@")+1] + str(randint(1,100))
 
-                return render_template("session.html",session=session,sign_up = True, google_signup = True,
-                display=False, google_email=decoded_email,username=decoded_username)
+                return render_template("session.html",session=session,sign_up = True, 
+                google_signup = True, display=False, google_email=decoded_email,username=decoded_username)
 
 
             except:
-                return "Error"        
+                return render_template("session.html",session=session,sign_up = True, 
+                google_signup = True, display=True,error_message="Something Went Wrong")        
     
     else:
-        return render_template("session.html",session=session,sign_up = True, google_signup = True, 
+        return render_template("session.html",session=session,sign_up = True, 
+        google_signup = True, display=True)
+
+@app.route("/login/google",methods=["GET","POST"])
+def google_login():
+    if request.method == "POST":
+        if request.form["credential"]:
+            try:
+                decoded = jwt.decode(request.form["credential"],verify=False)
+                decoded_email = decoded["email"]
+                return render_template("session.html",session=session,sign_up = False, 
+                google_signup = True, display=False, google_email=decoded_email)
+
+
+            except:
+                return render_template("session.html",session=session,sign_up = False, 
+                google_signup = True, display=True, error_message="Something Went Wrong.")
+    else:
+        return render_template("session.html",session=session,sign_up = False, google_signup = True, 
         display=True)
+            
 
-
-    # authorization_url, state = flow.authorization_url()
-    # session["state"] = state
-    # return redirect(authorization_url)
 
 
 # -- Normal Routes -- 
@@ -163,7 +186,7 @@ def login():
 
         except ValueError:
             return render_template("session.html",error_message="Password is incorrect",
-            sign_up=False)
+            sign_up=False,display=True)
 
         model.authenticate_user(user_to_authenticate,users,errors)
 
@@ -192,7 +215,7 @@ def logout():
     return redirect(url_for("index"))
 
 """
-ROUTE /groups
+ROUTE /group
 METHODS: GET, POST
 GET: Displays all available groups, or by search
 POST: Creates a group
@@ -217,6 +240,8 @@ def group():
         
         model.add_group(new_group, groups, errors)
         
+        # TODO: error handling
+        
         return render_template("group.html", session=session,group=new_group.to_document(), errors=errors)
     else:
         
@@ -226,6 +251,17 @@ def group():
 
 @app.route('/group/<group_name>')
 def get_group(group_name):
+    errors = {'message': None}
+    
+    # #TODO: get author from the session
+    # is_active = False
+    # current_user = session.get('username')
+    
+    # # even though usernames are unique we use find one because if not it returns a cursor object
+    # author = users.find_one({'username':current_user})
+    # if author:
+    #     is_active = True
+
     
     if not session.get('username'):
         return render_template('session.html', session=session, sign_up=False, display=True)
@@ -235,58 +271,112 @@ def get_group(group_name):
         'name': group_name,
         'creator': 'FOR_QUERY',
         'about': 'FOR_QUERY',
-        'date_created': 'FOR_QUERY'
+        'date_created': 'FOR_QUERY',
+        'users': [],
+        'posts': []
     })
     
     group_to_view = model.get_group(group_query, groups)
+    group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
     
-    return render_template('group.html', session=session, group=group_to_view)
-
-
-# Old code (sign up)
-    #     existing_user = users.find_one({"email":request.form["email"]})
-    #     if users.find_one({"username":request.form["username"]}):
-    #         return render_template("session.html",session=session,
-    #         error_message="This username already exists",sign_up = True)
-        
-    #     if not existing_user:
-    #         email = request.form["email"]
-    #         username = request.form["username"]
-    #         # encode password for hashing
-    #         password = request.form["password"].encode("utf-8")
-    #         salt = bcrypt.gensalt()
-    #         hashed_pw = bcrypt.hashpw(password,salt)
-    #         # add user to db
-    #         users.insert_one({"email":email,"username":username,"password":hashed_pw})
-    #         # store user in session
-    #         session["username"] = username
-    #         return redirect(url_for("index"))
-
-    #     else:
-    #         return render_template("session.html", session=session,
-    #         error_message="There is already an account with this email",sign_up=True)
-    # else:
-    #     return render_template("session.html",session=session,sign_up=True)
-
-
-    # Old code (log in) 
-    # if request.method == "POST":
-    #     login_user = users.find_one({"email":request.form["email"]})
-
-    #     if login_user:
-    #         db_password = login_user["password"]
-    #         # encode password to be compared
-    #         password  = request.form["password"].encode("utf-8")
-    #         # compare submitted password and the one in the form
-    #         if bcrypt.checkpw(password,db_password):
-    #             session["username"] = login_user["username"]
-    #             return redirect(url_for("index"))
-    #         else:
-    #             return render_template("session.html",session=session,
-    #             error_message="Invalid Password",signup=False)
-    #     else:
-    #         return render_template("session.html",session=session,
-    #             error_message="User does not exist",signup=False)
-    # else:
-    #     return render_template("session.html",session=session,signup=False)
+    result = []
+    for post in group_posts:
+        post_instance = Post.from_document(post)
+        post_instance.author = model.get_user_by_id(post_instance.author, users)['username']
+        result.append(post_instance)
     
+    # TODO: error handling
+    
+    return render_template('group.html', session=session, group=group_to_view, posts=result)
+
+@app.route('/post', methods=['POST'])
+def post():
+    errors = {'message': None}
+    
+    if not session.get('username'):
+        return redirect('login')
+    
+    group_name = request.form['group_name']
+    user = User.from_document({
+                "email": "FOR_QUERY",
+                "username": session.get('username') ,
+                "password": "FOR_QUERY"
+            })  
+      
+    author_id = model.get_user(user, users)['_id']
+    content = request.form['content']
+    time = date.today() #.strftime("%B %d, %Y")
+    
+    new_post = Post.from_document({
+        'author': author_id,
+        'group': group_name,
+        'content': content,
+        'date': time,
+        'group_image': 'https://imageio.forbes.com/blogs-images/forbestechcouncil/files/2019/01/canva-photo-editor-8-7.jpg?fit=bounds&format=jpg&width=960'
+    })
+    
+    model.create_post(new_post, posts, errors)
+    
+    # TODO: error handling
+    
+    return redirect(url_for('get_group', group_name=group_name))
+
+#TODO: - If there are no posts and the user is not logged in it shows up blank, handle this edge case
+# @app.route("/group", methods=['GET', 'POST'])
+# def group():
+#     # if request method == post 
+#     # collect data from post
+#     # add to db 
+#     # render all the posts in the db
+#     # else display the current posts inside the db
+
+#     #TODO: get author from the session
+#     is_active = False
+#     current_user = session.get('username')
+#     # even though usernames are unique we use find one because if not it returns a cursor object
+#     author = users.find_one({'username':current_user})
+#     if author:
+#         is_active = True
+
+#     if request.method == 'POST':
+#         #TODO get group from session
+#         group = ObjectId('6261acca285a88b547479b78')
+#         content = request.form['content']
+#         time = date.today().strftime("%B %d, %Y")
+#         #TODO get image from session
+#         image = 'https://imageio.forbes.com/blogs-images/forbestechcouncil/files/2019/01/canva-photo-editor-8-7.jpg?fit=bounds&format=jpg&width=960'
+
+#         #create post
+#         new_post = Post(author=author['_id'],group=group,content=content,date=time,image=image)
+#         posts.insert_one({'author':new_post.author,'group':new_post.group,'content':new_post.content,'date':new_post.date,'group_image':new_post.image})
+
+#         group_info = groups.find_one({})
+#         group_posts = posts.find({'group': group_info['_id']})
+#         result = []
+#         for post in group_posts:
+#             author_name = users.find_one({'_id':post['author']})
+#             result.append(Post.from_document({
+#                 author_name['username'],
+#                 group_info['group_name'],
+#                 post['content'],
+#                 post['date'],
+#                 post['group_image']
+#             }))
+    
+#         if result:
+#             return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
+
+#     else:
+#         # group_info = test_groups.find_one({})
+#         group_posts = posts.find({'group': group_info['_id']})
+#         result = []
+#         for post in group_posts:
+#             author_name = users.find_one({'_id':post['author']})
+#             result.append(Post.from_document({
+#                 author_name['username'],
+#                 group_info['group_name'],
+#                 post['content'],
+#                 post['date'],
+#                 post['group_image']
+#             }))
+#         return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)

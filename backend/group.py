@@ -11,8 +11,8 @@ class Group():
         self.date_created = date_created
         
         # Sets of ObjectIds
-        self.users = set()
-        self.posts = set()
+        self.users = []
+        self.posts = []
 
     
     @classmethod
@@ -21,8 +21,8 @@ class Group():
         
         group = Group(document['creator'], document['name'],document['about'], document['date_created'])
        
-        # group.users.union(document['users'])
-        # group.posts.union(document['posts'])
+        # group.users = document['users']
+        # group.posts = document['posts']
         
         return group
 
