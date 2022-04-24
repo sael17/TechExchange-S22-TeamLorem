@@ -18,12 +18,14 @@
         {%endif%}
 
             <div class="input-container">
-                {%if sign_up%}
+                {%if google_signup%}
+                <input type="email" name="email" placeholder="example@email.com" 
+                value ={{google_email}} required ">
+                {%elif sign_up%}
                 <input type="email" name="email" placeholder="example@email.com" required
-                title="Please input a valid email format"
+                title="Please input a valid email format" 
                 patter="/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}
-                [a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/"
-                >
+                [a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/">
                 {%else%}
                 <input type="email" name="email" placeholder="example@email.com" 
                 required>
@@ -32,10 +34,17 @@
             
             {%if sign_up%}
             <div class="input-container">
+                {%if google_signup%}
+                <input type="text" name="username" placeholder="username" required value="{{username}}"
+                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}" minlength="6" maxlength="16">
+
+                {%else%}
                 <input type="text" name="username" placeholder="username" required
                 title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
                 pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}"
                 minlength="6" maxlength="16">
+                {%endif%}
             </div>
             {%endif%}
            
@@ -67,23 +76,33 @@
                 <input type="submit" value="Log In">
                 {%endif%}
             </div>
-
+            
+            {%if display%}
             <div class="or-container">
                 <h3><span>OR</span></h3>
             </div>
 
             <div class="options">
-                <div id="g_id_onload" data-client_id="578828002560-51agl16hghjdsl9roobutc34cdc4v487.apps.googleusercontent.com"
-                    data-login_uri="https://team-lorem-goal-up.herokuapp.com/index" 
+                {%if sign_up%}
+                <div id="g_id_onload" data-client_id="654704100832-apsssepjo2lgl9iqine185m0faa8lj7t.apps.googleusercontent.com"
+                    data-login_uri="https://team-lorem-goal-up.herokuapp.com/login/google" 
                     data-auto_prompt="false"
                     data-context="use">
                     
                 <div>
+                
+                {%else%}
+                <div id="g_id_onload" data-client_id="654704100832-apsssepjo2lgl9iqine185m0faa8lj7t.apps.googleusercontent.com"
+                    data-login_uri="https://team-lorem-goal-up.herokuapp.com/login/google" 
+                    data-auto_prompt="false" data-context="use">
+                <div>
+                {%endif%}
                 <div class="g_id_signin" data-type="standard" data-size="large" 
                     data-theme="outline" data-text="sign_in_with"
                     data-shape="rectangular" data-logo_alignment="left">
                 </div>
             </div>
+            {%endif%}
         </form>
 
     </section>
@@ -121,24 +140,6 @@
     <div id="g_id_onload" data-client_id="578828002560-51agl16hghjdsl9roobutc34cdc4v487.apps.googleusercontent.com" 
     data-callback="handleCredentialResponse">
     </div>
-    <script>
-        function handleCredentialResponse(response) {
-            // decodeJwtResponse() is a custom function defined by you
-            // to decode the credential response.
-            const responsePayload = decodeJwtResponse(response.credential);
-
-            console.log("ID: " + responsePayload.sub);
-            console.log('Full Name: ' + responsePayload.name);
-            console.log('Given Name: ' + responsePayload.given_name);
-            console.log('Family Name: ' + responsePayload.family_name);
-            console.log("Image URL: " + responsePayload.picture);
-            console.log("Email: " + responsePayload.email);
-        }
-    </script>
-
-
-
-
 
 </body>
 

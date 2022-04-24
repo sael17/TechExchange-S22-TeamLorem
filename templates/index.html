@@ -1,5 +1,9 @@
 {% extends "main.html" %}
 
+{% block styles%}
+<link rel="stylesheet" href="/static/css/posts.css">
+{% endblock %}
+
 {% block content %}
 {% for post in home_posts%}
 <div class="container mt-3">

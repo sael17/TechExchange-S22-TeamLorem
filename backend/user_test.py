@@ -1,6 +1,6 @@
 import unittest
 import user
-# import admin
+import admin
 
 
 # Data For Initial Tests
@@ -13,8 +13,8 @@ class TestUser(unittest.TestCase):
      # User instances to test
     user01 = user.User(test_email,test_username,test_password)
     user02 = user.User("yan.aquino1@upr.edu","yanc@aquino","123456789")
-    # user03 = admin.Admin("brandong.fung@techexchange.in","branfung","bran.fung12")
-    # user04 = admin.Admin("user04@email.com","user04","user01_is_the_best")
+    user03 = admin.Admin("brandong.fung@techexchange.in","branfung","bran.fung12")
+    user04 = admin.Admin("user04@email.com","user04","user01_is_the_best")
 
 
     def test_argument_types(self):
@@ -66,27 +66,27 @@ class TestUser(unittest.TestCase):
     def test_pw_to_star(self):
         self.assertEqual(len(self.user01.getPW()),len(self.user01.star_pw))
         self.assertEqual(len(self.user02.getPW()),len(self.user02.star_pw))
-        # self.assertEqual(len(self.user03.getPW()),len(self.user03.star_pw))
-        # self.assertEqual(len(self.user04.getPW()),len(self.user04.star_pw))
+        self.assertEqual(len(self.user03.getPW()),len(self.user03.star_pw))
+        self.assertEqual(len(self.user04.getPW()),len(self.user04.star_pw))
 
-        # self.assertEqual(self.user03.star_pw,"***********")
+        self.assertEqual(self.user03.star_pw,"***********")
 
 
     def test_can_moderate(self):
         self.assertEqual(self.user01.canModerate,False)
         self.assertEqual(self.user02.canModerate,False)
-        # self.assertEqual(self.user03.canModerate,True)
-        # self.assertEqual(self.user04.canModerate,True)
+        self.assertEqual(self.user03.canModerate,True)
+        self.assertEqual(self.user04.canModerate,True)
 
     def test_to_document(self):
         self.assertEqual(self.user01.to_document(),{"email":test_email,"username":test_username,
         "password":test_password})
         self.assertEqual(self.user02.to_document(),{"email":"yan.aquino1@upr.edu",
         "username":"yanc@aquino","password":"123456789"})
-        # self.assertEqual(self.user03.to_document(),{"email":"brandong.fung@techexchange.in",
-        # "username":"branfung","password":"bran.fung12"})
-        # self.assertEqual(self.user04.to_document(),{"email":"user04@email.com","username":"user04",
-        # "password":"user01_is_the_best"})
+        self.assertEqual(self.user03.to_document(),{"email":"brandong.fung@techexchange.in",
+        "username":"branfung","password":"bran.fung12"})
+        self.assertEqual(self.user04.to_document(),{"email":"user04@email.com","username":"user04",
+        "password":"user01_is_the_best"})
 
 
     def test_from_document(self):
