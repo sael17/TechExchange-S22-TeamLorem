@@ -1,3 +1,35 @@
+/* Groups Container */
+
+/* .group-container {
+
+} */
+
+/* Group */
+
+.group-name {
+    color: black;
+    text-decoration: none;
+}
+
+a.group-name:hover {
+    text-decoration: underline;
+}
+
+.group-info {
+    color: black;
+}
+
+.group-creator {
+    color: grey;
+}
+
+/* Create a Group */
+
+#create-group-form {
+    display: none;
+}
+
+/* MISC */
 /* Basic Color Palette for Website */
 
 :root{
