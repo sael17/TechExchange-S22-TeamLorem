@@ -19,36 +19,28 @@
     box-sizing: border-box;
 }
 
+html, body{
+    height: 100%;
+}
+
+main{
+    min-height: 100%;
+}
+
 body{
     background-color: var(--color-secondary-dark)!important;
+    font-family: 'Lato', sans-serif !important;
+    font-weight: 400;
 }
 
 .navbar{
     background-color: var(--color-primary-dark);
 }
 
-.container{
-    color:white;
-    background-color: var(--color-primary);
-    outline-color: var(--color-primary);
-    border-radius: 25px;
-}
-
-.group-info{
-    padding:1%;
+.footer-content{
+    padding: 5%;
+    background-color: var(--color-primary-dark);
     text-align: center;
-}
-
-img{
-    border-radius: 50%;
-    float: left;
-    max-width: 100%;
-}
-
-.post-content{
-    padding: 1%;
-}
-
-.date{
-    float:right;
+    position: absolute;
+    width: 100%;
 }
