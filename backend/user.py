@@ -1,3 +1,4 @@
+from collections import defaultdict
 import bcrypt
 import re
 
@@ -42,6 +43,9 @@ class User:
         self.__password = password
         self.star_pw = self.pw_to_star(password)
         self.canModerate = False
+        self.followers = defaultdict(list)
+        self.follwing = defaultdict(list)
+        
 
     def __str__(self) -> str:
         return "Email: {}'\n' " + "Username: {}'\n' " + "Password: {}".format(self.email,
@@ -82,6 +86,7 @@ class User:
             "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt)
         }
 
+  
 
 
     

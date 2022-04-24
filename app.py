@@ -64,6 +64,7 @@ app.secret_key = secrets.token_urlsafe(16)
 users = mongo.db.users
 posts = mongo.db.posts
 groups = mongo.db.groups
+test_groups = mongo.db.test_group
 
 # -- GOOGLE API section -- 
 
@@ -146,7 +147,6 @@ def google_login():
             
 
 
-
 # -- Normal Routes -- 
 @app.route("/signup",methods=["GET","POST"])
 def signup():
@@ -214,6 +214,246 @@ def logout():
     session.clear()
     return redirect(url_for("index"))
 
+
+
+# Old code (sign up)
+    #     existing_user = users.find_one({"email":request.form["email"]})
+    #     if users.find_one({"username":request.form["username"]}):
+    #         return render_template("session.html",session=session,
+    #         error_message="This username already exists",sign_up = True)
+        
+    #     if not existing_user:
+    #         email = request.form["email"]
+    #         username = request.form["username"]
+    #         # encode password for hashing
+    #         password = request.form["password"].encode("utf-8")
+    #         salt = bcrypt.gensalt()
+    #         hashed_pw = bcrypt.hashpw(password,salt)
+    #         # add user to db
+    #         users.insert_one({"email":email,"username":username,"password":hashed_pw})
+    #         # store user in session
+    #         session["username"] = username
+    #         return redirect(url_for("index"))
+
+    #     else:
+    #         return render_template("session.html", session=session,
+    #         error_message="There is already an account with this email",sign_up=True)
+    # else:
+    #     return render_template("session.html",session=session,sign_up=True)
+
+
+    # Old code (log in) 
+    # if request.method == "POST":
+    #     login_user = users.find_one({"email":request.form["email"]})
+
+    #     if login_user:
+    #         db_password = login_user["password"]
+    #         # encode password to be compared
+    #         password  = request.form["password"].encode("utf-8")
+    #         # compare submitted password and the one in the form
+    #         if bcrypt.checkpw(password,db_password):
+    #             session["username"] = login_user["username"]
+    #             return redirect(url_for("index"))
+    #         else:
+    #             return render_template("session.html",session=session,
+    #             error_message="Invalid Password",signup=False)
+    #     else:
+    #         return render_template("session.html",session=session,
+    #             error_message="User does not exist",signup=False)
+    # else:
+    #     return render_template("session.html",session=session,signup=False)
+
+
+
+"""
+Allows the user to modify their account and profile and the option to delete
+their account and connect to different platforms
+
+Returns:
+    JinjaTemplate: renders the same page again with all the changed made present.
+    It can also redirect to delete the account.
+"""
+@app.route("/account", methods=["GET","POST"])
+# this router shall be only available if a user is logged in
+def account():
+    errors = {"message":""}
+    current_user = session["username"]
+    user_doc = users.find_one({"username":current_user})
+    # save the current user to modify its info
+    current_user_instance = User.from_document({
+        "email":"email@temp.com",
+        "username": session["username"],
+        "password": "QUERYPASSWORD"
+    })
+    
+    user_posts = model.get_posts_from_user(current_user_instance,users,posts,errors)
+    result = []
+    for post in user_posts:
+            result.append(Post(author = session["username"], 
+            group = post["group"], 
+            content = post['content'], 
+            date = post['date'], 
+            image = post['group_image']))
+
+    if request.method =="POST":        
+        # get the input firstname from the form in order to update it
+        new_firstname = {"$set":{"firstname":request.form["firstname"]}}
+        users.update_one({"username":current_user},new_firstname)
+
+        # get the input lastame from the form in order to update it
+        new_lastname = {"$set":{"lastname":request.form["lastname"]}}
+        users.update_one({"username":current_user},new_lastname)
+
+        # get the input bio from the form in order to update it
+        new_bio = {"$set":{"bio":request.form["bio"]}}
+        users.update_one({"username":current_user},new_bio)
+
+    
+        user_doc = users.find_one({"username":current_user})
+
+        return render_template("account.html", session=session,
+        firstname=user_doc["firstname"],lastname=user_doc["lastname"],
+        bio=user_doc["bio"],password=user_doc["password"],
+        email=user_doc["email"],username=user_doc["username"],posts=result)
+
+
+     # load account info with the one prev found in the user's document
+    else:
+        try:
+            user_doc = users.find_one({"username":current_user})
+            return render_template("account.html", session=session,
+            firstname=user_doc["firstname"],lastname=user_doc["lastname"],
+            bio=user_doc["bio"],password=user_doc["password"],
+            email=user_doc["email"],username=user_doc["username"],posts=result)
+
+        except:
+            return render_template("account.html",session=session,firstname="",lastname="",bio="",
+            password="******",posts=result)
+    
+
+
+"""
+Allows the user to reset or change their current password to a new one
+For now, the only validation is the username since these are unique
+More validation is needed for the future
+
+Returns:
+    If sucessful, returns user to login page, else the user made a mistake
+    (user not found) and it throws an error for the user to see
+"""
+@app.route("/change/password",methods=["GET","POST"])
+def change_password():
+    if request.method == "GET":
+        return render_template("update_account.html", session=session,change_password=True)
+
+    else:
+        # get document from current user, if there is one
+        current_user = users.find_one({"username":session["username"]})
+        if current_user:
+            current_user_email = current_user["email"]
+            form_email = request.form["email"]
+            if current_user_email == form_email:
+                # obtain new password and encrypt it for security reasons
+                password = request.form['new_password'].encode('utf-8')
+                salt = bcrypt.gensalt()
+                hashed_pasword = bcrypt.hashpw(password, salt)
+                # set the new value of the password
+                new_pw = {"$set": { "password": hashed_pasword }}
+                # update user's old password with new password
+                users.update_one({"email":current_user_email}, new_pw)
+                # go back to index page
+                return redirect("/account")
+            else:
+                return render_template("update_account.html",session=session,change_password=True,
+                error_message="Incorrect Email")
+        else:
+            return render_template("update_account.html", session=session,change_password=True,
+            error_message="Incorrect Email for this user")
+
+
+"""
+Allows the user to change their current email to a new one
+For now, the only validation is the username since these are unique
+More validation is needed for the future
+
+Returns:
+    If sucessful, returns user to login page, else the user made a mistake
+    (user not found) and it throws an error for the user to see
+"""
+@app.route("/change/email",methods=["GET","POST"])
+def change_email():
+    if request.method == "GET":
+        return render_template("update_account.html", session=session,change_email=True)
+    else:
+        # update old email with new email
+        current_user = users.find_one({"username":session["username"]})
+        if current_user:
+            email = request.form["email"]
+            if current_user["email"] == email:
+                new_email = request.form["new_email"]
+                # set the new value of the email
+                newvalue = {"$set": { "email": new_email }}
+                # validate the passwords match
+                pw_from_db = current_user["password"]
+                form_pw = request.form["password"].encode("utf-8")
+                if bcrypt.checkpw(form_pw,pw_from_db):
+                    # update user's old email with new email
+                    users.update_one({"email":current_user["email"]}, newvalue)
+                     # go back to account page
+                    return redirect("/account")
+            else:
+                return render_template("update_account.html", session=session, error_message="Incorrect User",
+                change_email=True)
+        else:
+            return render_template("update_account.html", session=session, error_message="Username not found",
+            change_email=True)
+
+@app.route("/change/username",methods=["GET","POST"])
+def change_username():
+    if request.method == "GET":
+        return render_template("update_account.html", session=session,change_username=True)
+    else:
+        # update old email with new email
+        current_user = users.find_one({"username":session["username"]})
+        if current_user:
+            email = request.form["email"]
+            if current_user["email"] == email:
+                new_username = request.form["new_username"]
+                # set the new value of the email
+                newvalue = {"$set": { "username": new_username}}
+                # validate the passwords match
+                pw_from_db = current_user["password"]
+                form_pw = request.form["password"].encode("utf-8")
+                if bcrypt.checkpw(form_pw,pw_from_db):
+                    # update user's old email with new email
+                    users.update_one({"username":current_user["username"]}, newvalue)
+                     # go back to account page
+                    return redirect("/account")
+            else:
+                return render_template("update_account.html", session=session, error_message="Incorrect User",
+                change_username=True)
+        else:
+            return render_template("update_account.html", session=session, error_message="Username not found",
+            change_username=True)
+
+
+"""
+Delete the users account from the users data base 
+
+Redirects to the logout where the account is also cleared from the current session
+and it is redirected to the main page (index.html)
+"""
+@app.route("/delete/account",methods=["GET","POST"])
+def delete_account():
+    if request.method == "POST":
+        users = mongo.db.users
+        users.delete_one({"username":session["username"]})
+        return redirect("/logout")
+    else:
+        if session.get('username'):
+            return redirect(url_for('login'))
+        return render_template("account.html")
+#TODO - If there are no posts and the user is not logged in it shows up blank, handle this edge case
 """
 ROUTE /group
 METHODS: GET, POST

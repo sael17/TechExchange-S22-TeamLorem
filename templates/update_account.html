@@ -1,0 +1,87 @@
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="/static/css/update_account.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+</head>
+
+<body class="main-container" onload="document.FormName.reset();">
+
+    <section class="form-container">
+        <h1 class="company-title">Goal Up &uarr;</h1>
+        {%if change_email%}
+        <form action="/change/email" method="post" class="login-form" id="login-form">
+        {%elif change_password%}
+        <form action="/change/password" method="post" class="login-form" id="login-form">
+        {%else%}
+        <form action="/change/username" method="post" class="login-form" id="login-form">
+        {%endif%}
+            <div class="input-container">
+                <h2>Current email</h2>
+                <input type="email" name="email" placeholder="example@email.com" required> 
+            </div>
+
+            <div class="input-container">
+
+                {%if change_email%}
+                <h2>New Email</h2>
+                <input type="email" name="new_email" placeholder="example@email.com" required
+                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
+                patter="/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}
+                [a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/">
+
+                {%elif change_password%}
+                <h2>New Password</h2>
+                <input type="password" name="new_password" placeholder="******" required
+                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.@$]).{8,25}">
+
+                {%else%}
+                <h2>New Username</h2>
+                <input type="text" name="new_username" placeholder="New UserName" required 
+                title="password must have at least one uppercase, one lowercase,one number one special character and must be between 8 and 24 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}"
+                minlength="6" maxlength="16">
+                {%endif%}
+
+            </div>
+
+            <div class="input-container input-container--password">
+                <h2>Confirm with Password</h2>
+                <input type="password" name="password" id="password" placeholder="password" required>
+                <i class="bi bi-eye-slash" id="togglePassword"></i>
+            </div>
+
+            <section>
+                {%if error_message%}
+                <span class="error-message">{{error_message}}</span>
+                {%endif%}
+            </section>
+
+            <div class="input-container--login">
+                <input type="submit" value="Sign Up"> 
+            </div>
+        </form>
+    </section>
+
+    <section class="signup-container">
+        <div class="signup">
+            <p class="signup-text">Want to go back?</p>
+            <a href="/account" class="signup-link"><span>Go Back &rarr;</span></a>
+        </div>
+    </section>
+    <!-- Resource source: https://www.javascripttutorial.net/javascript-dom/javascript-toggle-password-visibility/> -->
+    <script>
+
+        const togglePassword = document.querySelector("#togglePassword");
+        const password = document.querySelector("#password");
+
+        togglePassword.addEventListener("click", function () {
+            // toggle the type attribute
+            const type = password.getAttribute("type") === "password" ? "text" : "password";
+            password.setAttribute("type", type);
+            // toggle the icon
+            this.classList.toggle("bi-eye");
+        });
+    </script>
+</body>
+
