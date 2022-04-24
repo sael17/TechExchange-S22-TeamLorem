@@ -8,15 +8,41 @@
 
     <section class="form-container">
         <h1 class="company-title">Goal Up &uarr;</h1>
+        {%if change_email%}
         <form action="/change/email" method="post" class="login-form" id="login-form">
+        {%elif change_password%}
+        <form action="/change/password" method="post" class="login-form" id="login-form">
+        {%else%}
+        <form action="/change/username" method="post" class="login-form" id="login-form">
+        {%endif%}
             <div class="input-container">
                 <h2>Current email</h2>
                 <input type="email" name="email" placeholder="example@email.com" required> 
             </div>
 
             <div class="input-container">
+
+                {%if change_email%}
                 <h2>New Email</h2>
-                <input type="email" name="new_email" placeholder="example@email.com" required>
+                <input type="email" name="new_email" placeholder="example@email.com" required
+                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
+                patter="/^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}
+                [a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/">
+
+                {%elif change_password%}
+                <h2>New Password</h2>
+                <input type="password" name="new_password" placeholder="******" required
+                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.@$]).{8,25}">
+
+                {%else%}
+                <h2>New Username</h2>
+                <input type="text" name="new_username" placeholder="New UserName" required 
+                title="password must have at least one uppercase, one lowercase,one number one special character and must be between 8 and 24 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}"
+                minlength="6" maxlength="16">
+                {%endif%}
+
             </div>
 
             <div class="input-container input-container--password">
@@ -25,11 +51,11 @@
                 <i class="bi bi-eye-slash" id="togglePassword"></i>
             </div>
 
-                <!-- <section>
-                    {%if error_message%}
-                    <span class="error-message">{{error_message}}</span>
-                    {%endif%}
-                </section> -->
+            <section>
+                {%if error_message%}
+                <span class="error-message">{{error_message}}</span>
+                {%endif%}
+            </section>
 
             <div class="input-container--login">
                 <input type="submit" value="Sign Up"> 
