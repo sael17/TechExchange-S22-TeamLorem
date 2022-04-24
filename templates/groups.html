@@ -1,71 +1,72 @@
 {% extends 'main.html' %}
 
 {% block styles %}
-<link rel="stylesheet" href="/static/css/posts.css">
 <link rel="stylesheet" href="/static/css/groups.css">
+<link rel="stylesheet" href="/static/css/posts.css">
 {% endblock %}
 
 
 {% block content %}
-<main>
-    <h1>GROUPS</h1>
+<h1>GROUPS</h1>
 
-    <!-- Button to toggle display for #create-group-form  -->
-    <button class="btn" onclick="toggleForm(this)"><h2>Create a Group +</h2></button>
+<!-- Button to toggle display for #create-group-form  -->
+<div class="container">
+    <button class="btn toggle-form-btn" data-bs-toggle="collapse" data-bs-target="#create-group-form" onclick="toggleText(this)">Create a Group +</button>
+</div>
 
-    <div class="container" id="create-group-form">
-        <form action="/group" method="post">
-            <h3 class="create-group-title">Create a GoalUP Group</h3>
-            <div class="mb-3">
-                <label for="group-name" class="form-label" oninput="updateName(this)">Group Name</label>
-                <input type="text" class="form-control group-name" id="group-name" name="group-name" placeholder="">
-              </div>
-              <div class="mb-3">
-                <label for="group-info" class="form-label">Group Information</label>
-                <textarea class="form-control group-info" id="group-info" name="group-info" rows="3" placeholder="What is your GoalUP group about?"></textarea>
-              </div>              
-        </form>
-    </div>
+<div class="container collapse" id="create-group-form">
+    <form action="/group" method="post">
+        <h3 class="create-group-title">Create a GoalUP Group</h3>
+        <div class="mb-3">
+            <label for="group-name" class="form-label" oninput="updateName(this)">Group Name</label>
 
-    <div class="groups-container">
-        {% for group in groups%}
-        <div class="container mt-3">
-            <a class="btn group-name" href="/group/{{ group.name }}"><h2>{{group.name}}</h2></a>
-            <p class="group-info" >{{ group.about }}</p>
-            <p class="group-creator">by: {{ group.creator }}</p>
+            <input type="text" class="form-control group-name-input" id="group-name" name="group-name"
+             pattern="\^[a-zA-Z0-9\S]$\g" minlength="4" maxlength="24"
+             title="Group name must not contain spaces or special characters. 4-24 Characters allowed.">
         </div>
-        {% endfor %}
+        <div class="mb-3">
+            <label for="group-info" class="form-label">Group Information</label>
+            <textarea class="form-control group-info" id="group-info" name="group-info" rows="4" placeholder="What is your GoalUP group about?" maxlength="500" required ></textarea>
+        </div>
+        <button type="submit" class="btn btn-style mb-3">Create Group</button>
+    </form>
+</div>
+
+<div class="groups-container">
+    {% for group in groups%}
+    <div class="container mt-3">
+        <a class="btn group-name" href="/group/{{ group.name }}"><h2>{{group.name}}</h2></a>
+        <p class="group-info" >{{ group.about }}</p>
+        <p class="group-creator">by: {{ group.creator }}</p>
     </div>
+    {% endfor %}
+</div>
 
-
-</main>
 
 <script>
-    function toggleForm(e) {
+    function toggleText(e) {
         const form = document.getElementById("create-group-form");
 
-        if (form.style.display === "block") {
-            form.style.display = "none";
-            e.innerHTML = "<h2>Create a Group +</h2>"
+        if (form.classList.contains("hidden-form")) {
+            e.innerHTML = "Create a Group +"
+            form.classList.toggle("hidden-form")
         } 
         else {
-            form.style.display = "block";
-            e.innerHTML = "<h2><- Back</h2>"
+            e.innerHTML = "<- Back"
+            form.classList.toggle("hidden-form")
         }
       }
       
-    //function updateName(e) {
-    //    let text = e.value
-    //    if (text === " ") {
-    //        text = ""
-    //    }
-    //    else if (!text.endsWith("- ") && text.endsWith(" ")) {
-    //       text = text.trim()
-    //        text = text + "-"
-    //    }
-    //    e.value = text
-
-    //}
+    $("input.group-name-input").on({
+    keydown: function(e) {
+        if (e.which === 32) {
+            return false;
+        }
+    },
+    change: function() {
+        this.value = this.value.replace(/\s/g, "");
+    }
+    });
 </script>
 
 {% endblock %}

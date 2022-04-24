@@ -57,8 +57,8 @@ app.config['MONGO_URI'] = f"mongodb+srv://admin:{mongodb_password}@cluster0.3pto
 # Initialize PyMongo
 mongo = PyMongo(app, tlsCAFile=certifi.where())
 
-# Session Data/Cookie
-app.secret_key = secrets.token_urlsafe(16)
+# # Session Data/Cookie
+# app.secret_key = secrets.token_urlsafe(16)
 
 # Collection References
 users = mongo.db.users
@@ -468,21 +468,19 @@ def group():
         return render_template('session.html', session=session, sign_up=False, display=True)
     
     if request.method == 'POST':
-        try:
-            new_group = Group.from_document({
-                'name': request.form['group_name'],
-                'about': request.form['about'],
-                'creator': session.get(),
-                'date_created': datetime.datetime.now()
-            })
-        except:
-            errors['message'] = 'Could not read form and/or session data'
+        new_group = Group.from_document({
+            'name': request.form['group-name'],
+            'about': request.form['group-info'],
+            'creator': session.get('username'),
+            'date_created': datetime.datetime.now()
+        })
         
         model.add_group(new_group, groups, errors)
         
         # TODO: error handling
         
-        return render_template("group.html", session=session,group=new_group.to_document(), errors=errors)
+        
+        return redirect(url_for('get_group', group_name=new_group.name))
     else:
         
         groups_to_view = model.get_groups(groups)
