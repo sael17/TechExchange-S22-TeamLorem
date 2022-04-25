@@ -116,4 +116,8 @@ textarea{
     background: transparent;
     border: 0px !important;
     padding: 2% !important;
+} 
+
+#post-group{
+    margin-top: 1rem;
 }

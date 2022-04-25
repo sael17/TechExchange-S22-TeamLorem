@@ -637,7 +637,7 @@ def post():
         'group': group_name,
         'content': content,
         'date': time,
-        'group_image': 'https://imageio.forbes.com/blogs-images/forbestechcouncil/files/2019/01/canva-photo-editor-8-7.jpg?fit=bounds&format=jpg&width=960'
+        'group_image': '/static/img/Page-logo.png'
     })
     
     model.create_post(new_post, posts, errors)
