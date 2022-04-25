@@ -281,11 +281,24 @@ UPDATE group
 '''
 DELETE user
 '''
+def delete_user(user: User, users: collection, errors: dict):
+    try:
+        users.delete_one({'username': user.username})        
+    except:
+        errors["message"] = "Couldn't perform this action. Please try again later"
 
 '''
 DELETE post
 '''
+def delete_posts_from_user(user: User,users: collection, posts: collection, errors: dict):
+    try:
+        author_id = get_user(user, users)['_id']
+        posts.delete_many({'author': author_id})
+        
+    except:
+        errors["message"] = "Couldn't perform this action. Please try again later"
 
+    
 '''
 DELETE group
 '''

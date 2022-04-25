@@ -446,15 +446,26 @@ Delete the users account from the users data base
 Redirects to the logout where the account is also cleared from the current session
 and it is redirected to the main page (index.html)
 """
-@app.route("/delete/account",methods=["GET","POST"])
+@app.route("/delete/account",methods=["POST"])
 def delete_account():
-    if request.method == "POST":
-        users.delete_one({"username":session["username"]})
-        return redirect("/logout")
-    else:
-        if session.get('username'):
-            return redirect(url_for('login'))
-        return render_template("account.html")
+    errors = {'message': None}
+    
+    if not session.get('username'):
+        return redirect('login')
+    
+    user_to_delete = User.from_document({
+        'username': session.get('username'),
+        'email': 'FOR_QUERY',
+        'password': 'FOR_QUERY'
+    })
+    
+    model.delete_posts_from_user(user_to_delete, users, posts, errors)
+    if not errors['message']:
+        model.delete_user(user_to_delete, users, errors)
+    
+    if errors['message']:
+        return render_template("account.html", session=session, firstname="", lastname="", bio="", password="******", error=errors['message'])
+    return redirect("logout")
 
 """
 ROUTE /group
