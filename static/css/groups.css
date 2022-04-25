@@ -11,13 +11,6 @@
     --color-black: #000;
 }
 
-
-/* Groups Container */
-
-/* .group-container {
-
-} */
-
 /* Group */
 
 .group-name {
@@ -41,6 +34,8 @@ a.group-name:hover {
 
 .toggle-form-btn {
     background-color: var(--color-primary-dark);
+    font-size: 25px !important;
+    height: 55px;
 }
 
 #create-group-form {
@@ -49,6 +44,11 @@ a.group-name:hover {
 }
 
 /* MISC */
+
+.error-message {
+    display: grid;
+    place-items: center;
+}
 
 /* Input */
 textarea.post-input, textarea.group-info, .group-name-input {
@@ -61,8 +61,6 @@ textarea.post-input, textarea.group-info, .group-name-input {
     border-radius: 15px 50px !important;
     margin: auto !important;
 }
-
-
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
     color: black;

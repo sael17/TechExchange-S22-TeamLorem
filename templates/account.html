@@ -26,8 +26,8 @@
                         {%else%}
                         <img class="profilepic__image"
                             src="/static/img/code.jpeg"
-                            width="150" 
-                            height="150" 
+                            width="500px" 
+                            height="100px" 
                             alt="Profibild">
                         {%endif%}
                         <div class="profilepic__content">
@@ -106,7 +106,9 @@
                     </div>
 
                     <div class="delete-account">
-                        <button class="open-button" onclick="openForm()">Delete Account</button>
+                        <form action="{{ url_for('delete_account') }}" method="post">
+                            <button type="submit" class="open-button" onclick="openForm()">Delete Account</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -141,30 +143,29 @@
                         <div class="row">
                             <h2 class="account-section">Following</h2>
                             <div class="followers-container">
-                                <a href="show/following" class="followers-text">10 Following</a>
+                                <a href="show/following" class="followers-text">{{following_count}} Following</a>
                             </div>
                         </div>
                         <div class="row">
                             <h2 class="account-section">Followers</h2>
                             <div class="followers-container">
-                                <a href="show/followers" class="followers-text">10 Followers</a>
+                                <a href="show/followers" class="followers-text">{{followers_count}} Followers</a>
                             </div>
                         </div>
-                        
                     </div> 
                 </div>
-                 
-            
-            </div>
-            
+                <div class="row" id="go-back">
+                    <button class="account-info-btn btn">
+                        <a class="change-link" href="/index">Go Back To Main Page</a>
+                    </button>
+                </div>
+            </div>    
         </div>
-
     </div>
 
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous"></script>
-
 
 </body>

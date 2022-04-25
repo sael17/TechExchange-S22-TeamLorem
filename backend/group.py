@@ -9,10 +9,6 @@ class Group():
         self.about = about
         self.date_created = date_created
         
-        # Sets of ObjectIds
-        # self.users = []
-        # self.posts = []
-
     
     @classmethod
     def from_document(cls,document):

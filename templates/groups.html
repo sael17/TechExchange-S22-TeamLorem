@@ -7,30 +7,41 @@
 
 
 {% block content %}
-<h1>GROUPS</h1>
+
+{% if error %}
+<div class="error-message">
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div>
+            {{error}}
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+</div>
+{% endif %}  
 
 <!-- Button to toggle display for #create-group-form  -->
+
 <div class="container">
     <button class="btn toggle-form-btn" data-bs-toggle="collapse" data-bs-target="#create-group-form" onclick="toggleText(this)">Create a Group +</button>
+    <div class="collapse" id="create-group-form">
+        <form action="/group" method="post">
+            <h3 class="create-group-title">Create a GoalUp Group</h3>
+            <div class="mb-3">
+                <label for="group-name" class="form-label" oninput="updateName(this)">Group Name</label>
+    
+                <input type="text" class="form-control group-name-input" id="group-name" name="group-name"
+                 pattern="\^[a-zA-Z0-9\S]$\g" minlength="4" maxlength="24"
+                 title="Group name must not contain spaces or special characters. 4-24 Characters allowed.">
+            </div>
+            <div class="mb-3">
+                <label for="group-info" class="form-label">Group Information</label>
+                <textarea class="form-control group-info" id="group-info" name="group-info" rows="4" placeholder="What is your GoalUP group about?" maxlength="500" required ></textarea>
+            </div>
+            <button type="submit" class="btn btn-style mb-3">Create Group</button>
+        </form>
+    </div>    
 </div>
 
-<div class="container collapse" id="create-group-form">
-    <form action="/group" method="post">
-        <h3 class="create-group-title">Create a GoalUP Group</h3>
-        <div class="mb-3">
-            <label for="group-name" class="form-label" oninput="updateName(this)">Group Name</label>
-
-            <input type="text" class="form-control group-name-input" id="group-name" name="group-name"
-             pattern="\^[a-zA-Z0-9\S]$\g" minlength="4" maxlength="24"
-             title="Group name must not contain spaces or special characters. 4-24 Characters allowed.">
-        </div>
-        <div class="mb-3">
-            <label for="group-info" class="form-label">Group Information</label>
-            <textarea class="form-control group-info" id="group-info" name="group-info" rows="4" placeholder="What is your GoalUP group about?" maxlength="500" required ></textarea>
-        </div>
-        <button type="submit" class="btn btn-style mb-3">Create Group</button>
-    </form>
-</div>
 
 <div class="groups-container">
     {% for group in groups%}
@@ -52,21 +63,10 @@
             form.classList.toggle("hidden-form")
         } 
         else {
-            e.innerHTML = "<- Back"
+            e.innerHTML = "&larr; Back"
             form.classList.toggle("hidden-form")
         }
       }
-      
-    $("input.group-name-input").on({
-    keydown: function(e) {
-        if (e.which === 32) {
-            return false;
-        }
-    },
-    change: function() {
-        this.value = this.value.replace(/\s/g, "");
-    }
-    });
 </script>
 
 {% endblock %}

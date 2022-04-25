@@ -26,8 +26,8 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 from random import randint, random
 from datetime import date
-from bson import ObjectId
 
+import config
 import datetime
 import bcrypt 
 import certifi
@@ -35,7 +35,6 @@ import google.auth.transport.requests
 import gunicorn # for heroku deployment
 import jwt
 import model
-import secrets
 import os
 import pathlib
 import requests
@@ -43,13 +42,23 @@ import requests
 
 # -- Initialization section --
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets.token_hex(nbytes=16)
+
+# -- App config --
+app.config.from_object(config.Config)
+
+if os.environ.get('DEV_MODE') == '1':
+    app.config.from_object(config.DevConfig)
+else:
+    app.config.from_object(config.ProdConfig)
+
+# -- Session config --
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "filesystem"
 
 # -- Mongo Section -- 
 
 # Name of database
-db_name = 'test' if os.environ.get('DB_TEST') == '1' else 'GoalUp'
-app.config['MONGO_DBNAME'] = db_name
+db_name = app.config['MONGO_DBNAME']
 
 # URI of database
 mongodb_password = os.environ.get('MONGO_PASSWORD')
@@ -217,57 +226,6 @@ def logout():
     session.clear()
     return redirect(url_for("index"))
 
-
-
-# Old code (sign up)
-    #     existing_user = users.find_one({"email":request.form["email"]})
-    #     if users.find_one({"username":request.form["username"]}):
-    #         return render_template("session.html",session=session,
-    #         error_message="This username already exists",sign_up = True)
-        
-    #     if not existing_user:
-    #         email = request.form["email"]
-    #         username = request.form["username"]
-    #         # encode password for hashing
-    #         password = request.form["password"].encode("utf-8")
-    #         salt = bcrypt.gensalt()
-    #         hashed_pw = bcrypt.hashpw(password,salt)
-    #         # add user to db
-    #         users.insert_one({"email":email,"username":username,"password":hashed_pw})
-    #         # store user in session
-    #         session["username"] = username
-    #         return redirect(url_for("index"))
-
-    #     else:
-    #         return render_template("session.html", session=session,
-    #         error_message="There is already an account with this email",sign_up=True)
-    # else:
-    #     return render_template("session.html",session=session,sign_up=True)
-
-
-    # Old code (log in) 
-    # if request.method == "POST":
-    #     login_user = users.find_one({"email":request.form["email"]})
-
-    #     if login_user:
-    #         db_password = login_user["password"]
-    #         # encode password to be compared
-    #         password  = request.form["password"].encode("utf-8")
-    #         # compare submitted password and the one in the form
-    #         if bcrypt.checkpw(password,db_password):
-    #             session["username"] = login_user["username"]
-    #             return redirect(url_for("index"))
-    #         else:
-    #             return render_template("session.html",session=session,
-    #             error_message="Invalid Password",signup=False)
-    #     else:
-    #         return render_template("session.html",session=session,
-    #             error_message="User does not exist",signup=False)
-    # else:
-    #     return render_template("session.html",session=session,signup=False)
-
-
-
 """
 Allows the user to modify their account and profile and the option to delete
 their account and connect to different platforms
@@ -280,6 +238,10 @@ Returns:
 # this router shall be only available if a user is logged in
 def account():
     errors = {"message":""}
+    
+    if not session.get('username'):
+        return redirect(url_for('login'))
+    
     current_user = session["username"]
     user_doc = users.find_one({"username":current_user})
     # save the current user to modify its info
@@ -297,6 +259,22 @@ def account():
             content = post['content'], 
             date = post['date'], 
             image = post['group_image']))
+
+    user=users.find_one({'username':current_user})
+
+    followers = user['followers']
+    following = user["following"]
+    followers_count = len(followers)
+    following_count = len(following)
+    followers_names = []
+    following_names = []
+    for id in followers:
+        user_info = users.find_one({'_id':id})
+        following_names.append(user_info['username'])
+    
+    for id in following:
+        user_info = users.find_one({'_id':id})
+        followers_names.append(user_info["username"])
 
     if request.method =="POST":        
         # get the input firstname from the form in order to update it
@@ -317,25 +295,25 @@ def account():
         return render_template("account.html", session=session,
         firstname=user_doc["firstname"],lastname=user_doc["lastname"],
         bio=user_doc["bio"],password=user_doc["password"],
-        email=user_doc["email"],username=user_doc["username"],posts=result)
+        email=user_doc["email"],username=user_doc["username"],profile_pic=user_doc["profile_pic"],
+        following_count = following_count, followers_count = followers_count,posts=result)
 
 
      # load account info with the one prev found in the user's document
     else:
-        try:
+        
             user_doc = users.find_one({"username":current_user})
             return render_template("account.html", session=session,
             firstname=user_doc["firstname"],lastname=user_doc["lastname"],
             bio=user_doc["bio"],password=user_doc["password"],
             email=user_doc["email"],username=user_doc["username"],posts=result,
-            profile_pic=user_doc["profile_picture"])
+            profile_pic=user_doc["profile_pic"],following_count = following_count, 
+            followers_count = followers_count)
 
-        except:
-            return render_template("account.html",session=session,firstname="",lastname="",bio="",
-            password="******")
+        # except:
+        #     return render_template("account.html",session=session,firstname="",lastname="",bio="",
+        #     password="******")
     
-
-
 """
 Allows the user to reset or change their current password to a new one
 For now, the only validation is the username since these are unique
@@ -395,6 +373,9 @@ def change_email():
             email = request.form["email"]
             if current_user["email"] == email:
                 new_email = request.form["new_email"]
+                if users.find_one({"email":new_email}):
+                    return render_template("update_account.html", session=session, 
+                    error_message="Email Already Exists",change_email=True)
                 # set the new value of the email
                 newvalue = {"$set": { "email": new_email }}
                 # validate the passwords match
@@ -423,6 +404,10 @@ def change_username():
             email = request.form["email"]
             if current_user["email"] == email:
                 new_username = request.form["new_username"]
+                if users.find_one({"username":new_username}):
+                    return render_template("update_account.html", session=session, error_message="Incorrect User",
+                    change_username=True)
+            
                 # set the new value of the email
                 newvalue = {"$set": { "username": new_username}}
                 # validate the passwords match
@@ -431,6 +416,7 @@ def change_username():
                 if bcrypt.checkpw(form_pw,pw_from_db):
                     # update user's old email with new email
                     users.update_one({"username":current_user["username"]}, newvalue)
+                    session["username"] = new_username
                      # go back to account page
                     return redirect("/account")
             else:
@@ -465,7 +451,7 @@ def change_profile_pic():
                     error_message="URL is not a valid image URL! Please use a correct URL")
                
                 # set the new value of the email
-                newvalue = {"$set": { "profile_picture":profile_picture }}
+                newvalue = {"$set": { "profile_pic":profile_picture }}
                 # validate the passwords match
                 pw_from_db = current_user["password"]
                 form_pw = request.form["password"].encode("utf-8")
@@ -491,15 +477,26 @@ Delete the users account from the users data base
 Redirects to the logout where the account is also cleared from the current session
 and it is redirected to the main page (index.html)
 """
-@app.route("/delete/account",methods=["GET","POST"])
+@app.route("/deleteacc",methods=["POST"])
 def delete_account():
-    if request.method == "POST":
-        users.delete_one({"username":session["username"]})
-        return redirect("/logout")
-    else:
-        if session.get('username'):
-            return redirect(url_for('login'))
-        return render_template("account.html")
+    errors = {'message': None}
+    
+    if not session.get('username'):
+        return redirect('login')
+    
+    user_to_delete = User.from_document({
+        'username': session.get('username'),
+        'email': 'FOR_QUERY',
+        'password': 'FOR_QUERY'
+    })
+    
+    model.delete_posts_from_user(user_to_delete, users, posts, errors)
+    if not errors['message']:
+        model.delete_user(user_to_delete, users, errors)
+    
+    if errors['message']:
+        return render_template("account.html", session=session, firstname="", lastname="", bio="", password="******", error=errors['message'])
+    return redirect(url_for('logout'))
 
 """
 ROUTE /group
@@ -514,6 +511,12 @@ def group():
     if not session.get('username'):
         return render_template('session.html', session=session, sign_up=False, display=True)
     
+    groups_to_view = model.get_groups(groups, errors)
+    
+    if errors['message']:
+        return render_template('groups.html', session=session, groups=groups_to_view, error=errors['message'])
+
+
     if request.method == 'POST':
         new_group = Group.from_document({
             'name': request.form['group-name'],
@@ -524,14 +527,12 @@ def group():
         
         model.add_group(new_group, groups, errors)
         
-        # TODO: error handling
-        
+        if errors['message']:
+            return render_template('groups.html', session=session, groups=groups_to_view, error=errors['message'])
         
         return redirect(url_for('get_group', group_name=new_group.name))
+    
     else:
-        
-        groups_to_view = model.get_groups(groups)
-        
         return render_template('groups.html', session=session, groups=groups_to_view)
 
 
@@ -550,15 +551,17 @@ def get_group(group_name):
         'name': group_name,
         'creator': 'FOR_QUERY',
         'about': 'FOR_QUERY',
-        'date_created': 'FOR_QUERY',
-        'users': [],
-        'posts': []
+        'date_created': 'FOR_QUERY'
     })
 
     current_user = session.get('username')
-    group_to_view = model.get_group(group_query, groups)
+    group_to_view = model.get_group(group_query, groups, errors)
+    
+    if errors['message']:
+        return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following, error=errors['message'])
+
     group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
-    following = model.following(current_user, users, )
+    following = model.following(current_user, users)
     
     result = []
     for post in group_posts:
@@ -566,10 +569,8 @@ def get_group(group_name):
         post_instance.author = model.get_user_by_id(post_instance.author, users)['username']
         post_instance.date = post_instance.date.strftime('%Y %m %d')
         result.append(post_instance)
-    
-    # TODO: error handling
-    
-    return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following)
+        
+    return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following, error=errors['message'])
 
 '''
 Inserts the new post into the database and redirects 
@@ -583,6 +584,7 @@ def post():
         return redirect('login')
     
     group_name = request.form['group_name']
+    
     user = User.from_document({
                 "email": "FOR_QUERY",
                 "username": session.get('username') ,
@@ -603,71 +605,22 @@ def post():
     
     model.create_post(new_post, posts, errors)
     
-    print(errors['message'])
-    # TODO: error handling
+    if errors['message']:
+        group_to_view = groups.find_one({'name': group_name})
+        
+        group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
+        current_user = session.get('username')
+        following = model.following(current_user, users)
+
+        result = []
+        for post in group_posts:
+            post_instance = Post.from_document(post)
+            post_instance.author = model.get_user_by_id(post_instance.author, users)['username']
+            result.append(post_instance)
+
+        return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following, error=errors['message'])
     
-    return redirect(url_for('get_group', group_name=group_name))
-
-#TODO: - If there are no posts and the user is not logged in it shows up blank, handle this edge case
-# @app.route("/group", methods=['GET', 'POST'])
-# def group():
-#     # if request method == post 
-#     # collect data from post
-#     # add to db 
-#     # render all the posts in the db
-#     # else display the current posts inside the db
-
-#     #TODO: get author from the session
-#     is_active = False
-#     current_user = session.get('username')
-#     # even though usernames are unique we use find one because if not it returns a cursor object
-#     author = users.find_one({'username':current_user})
-#     if author:
-#         is_active = True
-
-#     if request.method == 'POST':
-#         #TODO get group from session
-#         group = ObjectId('6261acca285a88b547479b78')
-#         content = request.form['content']
-#         time = date.today().strftime("%B %d, %Y")
-#         #TODO get image from session
-#         image = 'https://imageio.forbes.com/blogs-images/forbestechcouncil/files/2019/01/canva-photo-editor-8-7.jpg?fit=bounds&format=jpg&width=960'
-
-#         #create post
-#         new_post = Post(author=author['_id'],group=group,content=content,date=time,image=image)
-#         posts.insert_one({'author':new_post.author,'group':new_post.group,'content':new_post.content,'date':new_post.date,'group_image':new_post.image})
-
-#         group_info = groups.find_one({})
-#         group_posts = posts.find({'group': group_info['_id']})
-#         result = []
-#         for post in group_posts:
-#             author_name = users.find_one({'_id':post['author']})
-#             result.append(Post.from_document({
-#                 author_name['username'],
-#                 group_info['group_name'],
-#                 post['content'],
-#                 post['date'],
-#                 post['group_image']
-#             }))
-    
-#         if result:
-#             return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
-
-#     else:
-#         # group_info = test_groups.find_one({})
-#         group_posts = posts.find({'group': group_info['_id']})
-#         result = []
-#         for post in group_posts:
-#             author_name = users.find_one({'_id':post['author']})
-#             result.append(Post.from_document({
-#                 author_name['username'],
-#                 group_info['group_name'],
-#                 post['content'],
-#                 post['date'],
-#                 post['group_image']
-#             }))
-#         return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
-
+    return redirect(url_for('get_group', group_name=group_name, error=errors['message']))
 
 '''
 If the user is not already following the user they selected then it follows them and updates the user.
