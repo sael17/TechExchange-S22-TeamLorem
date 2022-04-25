@@ -1,3 +1,9 @@
+"""
+    This class represents a post in the database. The member variables for this class are what
+    you would expect from a common post: a author, group, content, a date an a group image
+
+"""
+
 class Post:
     def __init__(self, author, group, content, date, image):
         self.author = author
