@@ -297,6 +297,22 @@ def account():
             date = post['date'], 
             image = post['group_image']))
 
+    user=users.find_one({'username':current_user})
+
+    followers = user['followers']
+    following = user["following"]
+    followers_count = len(followers)
+    following_count = len(following)
+    followers_names = []
+    following_names = []
+    for id in followers:
+        user_info = users.find_one({'_id':id})
+        following_names.append(user_info['username'])
+    
+    for id in following:
+        user_info = users.find_one({'_id':id})
+        followers_names.append(user_info["username"])
+
     if request.method =="POST":        
         # get the input firstname from the form in order to update it
         new_firstname = {"$set":{"firstname":request.form["firstname"]}}
@@ -316,7 +332,8 @@ def account():
         return render_template("account.html", session=session,
         firstname=user_doc["firstname"],lastname=user_doc["lastname"],
         bio=user_doc["bio"],password=user_doc["password"],
-        email=user_doc["email"],username=user_doc["username"],posts=result)
+        email=user_doc["email"],username=user_doc["username"],profile_pic=user_doc["profile_picture"],
+        following_count = following_count, followers_count = followers_count,posts=result)
 
 
      # load account info with the one prev found in the user's document
@@ -327,14 +344,13 @@ def account():
             firstname=user_doc["firstname"],lastname=user_doc["lastname"],
             bio=user_doc["bio"],password=user_doc["password"],
             email=user_doc["email"],username=user_doc["username"],posts=result,
-            profile_pic=user_doc["profile_picture"])
+            profile_pic=user_doc["profile_picture"],following_count = following_count, 
+            followers_count = followers_count)
 
         except:
             return render_template("account.html",session=session,firstname="",lastname="",bio="",
             password="******")
     
-
-
 """
 Allows the user to reset or change their current password to a new one
 For now, the only validation is the username since these are unique
