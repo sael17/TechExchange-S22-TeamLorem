@@ -28,6 +28,7 @@ from random import randint, random
 from datetime import date
 from bson import ObjectId
 
+import config
 import datetime
 import bcrypt 
 import certifi
@@ -35,7 +36,6 @@ import google.auth.transport.requests
 import gunicorn # for heroku deployment
 import jwt
 import model
-import secrets
 import os
 import pathlib
 import requests
@@ -43,13 +43,19 @@ import requests
 
 # -- Initialization section --
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets.token_hex(nbytes=16)
 
+# -- App config --
+app.config.from_object(config.Config)
+
+if os.environ.get('DEV_MODE') == '1':
+    app.config.from_object(config.DevConfig)
+else:
+    app.config.from_object(config.ProdConfig)
+    
 # -- Mongo Section -- 
 
 # Name of database
-db_name = 'test' if os.environ.get('DB_TEST') == '1' else 'GoalUp'
-app.config['MONGO_DBNAME'] = db_name
+db_name = app.config['MONGO_DBNAME']
 
 # URI of database
 mongodb_password = os.environ.get('MONGO_PASSWORD')
@@ -94,17 +100,18 @@ def index():
                 return "Error"
 
     elif request.method == 'GET':
-        pass
+        current_user = session.get('username')
+        if current_user:
+            recent_posts = model.get_recent_posts(current_user, users, posts)
+            if recent_posts:
+                return render_template('index.html', recent_posts=recent_posts)
+            return render_template('index.html')
+
+        else:
+            return redirect(url_for('signup'))
         
     else:
-        data = model.get_posts(posts)
-        result = []
-        for entry in data:
-            # result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
-            result.append(Post.from_document(entry))
-            if result:
-                return render_template('index.html', home_posts=result)
-    return render_template('index.html',error='There are no posts available')
+        return render_template('index.html',error='There method is not supported')
 
 
 # -- GOOGLE API Routes -- 
@@ -516,11 +523,6 @@ def delete_account():
             return redirect(url_for('login'))
         return render_template("account.html")
 
-
-
-
-
-#TODO - If there are no posts and the user is not logged in it shows up blank, handle this edge case
 """
 ROUTE /group
 METHODS: GET, POST
@@ -554,20 +556,14 @@ def group():
         
         return render_template('groups.html', session=session, groups=groups_to_view)
 
+
+'''
+Renders the post associated with the group the user selected
+'''
 @app.route('/group/<group_name>')
 def get_group(group_name):
     errors = {'message': None}
-    
-    # #TODO: get author from the session
-    # is_active = False
-    # current_user = session.get('username')
-    
-    # # even though usernames are unique we use find one because if not it returns a cursor object
-    # author = users.find_one({'username':current_user})
-    # if author:
-    #     is_active = True
-
-    
+        
     if not session.get('username'):
         return render_template('session.html', session=session, sign_up=False, display=True)
 
@@ -580,11 +576,11 @@ def get_group(group_name):
         'users': [],
         'posts': []
     })
+
     current_user = session.get('username')
     group_to_view = model.get_group(group_query, groups)
     group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
-    following = model.following(current_user, users)
-    print(following)
+    following = model.following(current_user, users, )
     
     result = []
     for post in group_posts:
@@ -596,6 +592,10 @@ def get_group(group_name):
     
     return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following)
 
+'''
+Inserts the new post into the database and redirects 
+the user to the group where they made the post. 
+'''
 @app.route('/post', methods=['POST'])
 def post():
     errors = {'message': None}
@@ -689,20 +689,23 @@ def post():
 #             }))
 #         return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
 
+
+'''
+If the user is not already following the user they selected then it follows them and updates the user.
+Also adds the current user to the list of followers of the user they just followed 
+'''
 @app.route('/follow', methods=["POST"])
 def follow():
     if request.method == 'POST':
         current_user = session.get('username')
-        print(current_user)
         current_user = users.find_one({'username':current_user})
 
         user_to_be_followed = request.form['user_to_be_followed']
-        print(user_to_be_followed)
         user_to_be_followed = users.find_one({'username':user_to_be_followed})
 
         group_name = request.form['group']
+
         if user_to_be_followed['_id'] not in current_user['following']:
-            print('hi')
             current_user['following'].append(user_to_be_followed['_id'])
             user_to_be_followed['followers'].append(current_user['_id'])
             users.update_one({'_id':current_user['_id']}, {'$set':{'following':current_user['following']}})
