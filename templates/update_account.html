@@ -12,6 +12,8 @@
         <form action="/change/email" method="post" class="login-form" id="login-form">
         {%elif change_password%}
         <form action="/change/password" method="post" class="login-form" id="login-form">
+        {%elif change_img%}
+        <form action="/change/profilepic" method="post" class="login-form" id="login-form">
         {%else%}
         <form action="/change/username" method="post" class="login-form" id="login-form">
         {%endif%}
@@ -21,8 +23,15 @@
             </div>
 
             <div class="input-container">
+                {%if change_img%}
+                <h2>Change Profile Image</h2>
+                <div class="input-container">
+                    <input type="url" class="form-control" name="image_url" id="image_url"
+                     placeholder="Image URL" 
+                     required>
+                </div>
 
-                {%if change_email%}
+                {%elif change_email%}
                 <h2>New Email</h2>
                 <input type="email" name="new_email" placeholder="example@email.com" required
                 title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
