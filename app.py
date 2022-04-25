@@ -417,6 +417,9 @@ def change_email():
             email = request.form["email"]
             if current_user["email"] == email:
                 new_email = request.form["new_email"]
+                if users.find_one({"email":new_email}):
+                    return render_template("update_account.html", session=session, 
+                    error_message="Email Already Exists",change_email=True)
                 # set the new value of the email
                 newvalue = {"$set": { "email": new_email }}
                 # validate the passwords match
@@ -445,6 +448,10 @@ def change_username():
             email = request.form["email"]
             if current_user["email"] == email:
                 new_username = request.form["new_username"]
+                if users.find_one({"username":new_username}):
+                    return render_template("update_account.html", session=session, error_message="Incorrect User",
+                    change_username=True)
+            
                 # set the new value of the email
                 newvalue = {"$set": { "username": new_username}}
                 # validate the passwords match
@@ -453,6 +460,7 @@ def change_username():
                 if bcrypt.checkpw(form_pw,pw_from_db):
                     # update user's old email with new email
                     users.update_one({"username":current_user["username"]}, newvalue)
+                    session["username"] = new_username
                      # go back to account page
                     return redirect("/account")
             else:
