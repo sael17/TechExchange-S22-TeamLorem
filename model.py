@@ -292,3 +292,11 @@ DELETE post
 '''
 DELETE group
 '''
+
+
+def following(username: str, users:collection):
+    user_info = users.find_one({'username':username})
+    result = []
+    for user_id in user_info['following']:
+        result.append(users.find_one({'_id':user_id})['username'])
+    return result
