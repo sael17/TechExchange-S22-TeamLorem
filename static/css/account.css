@@ -26,8 +26,7 @@ a {
 
 .container {
 	margin-top: 3rem;
-	text-align: center;
-	border: none;
+	text-align: center;	
 }
 
 .row {
@@ -58,10 +57,10 @@ a {
 	position: relative;
 	width: 125px;
 	height: 125px;
-	border: 3px solid var(--color-black);
+	/* border: 3px solid var(--color-black); */
 	border-radius: 50%;
 	overflow: hidden;
-	background-color: #111;
+	/* background-color: #111; */
 	margin: 0 auto;
 }
 
@@ -77,6 +76,7 @@ a {
 	object-fit: cover;
 	opacity: 1;
 	transition: opacity .2s ease-in-out;
+	border:3px solid black;
 }
 
 .profilepic__content {
