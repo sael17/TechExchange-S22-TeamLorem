@@ -142,6 +142,7 @@ def get_user(user: User, users: collection):
         user = users.find_one({'username': user.username})
     except:
         print('An exception occurred')
+        return
     return user
 
 
@@ -154,6 +155,7 @@ def get_user_by_email(user: User, users: collection):
         user = users.find_one({'email': user.email})
     except:
         print('An exception occurred')
+        return
 
     return user
 
@@ -166,6 +168,7 @@ def get_user_by_id(id: ObjectId, users: collection):
         user = users.find_one({'_id': id})
     except:
         print('An exception occurred')
+        return
 
     return user
 
@@ -202,10 +205,11 @@ Method that returns all the posts from a specific group
 
 def get_posts_from_group(group: Group, groups:collection, posts: collection, errors: dict):
     try:
-        group_name = get_group(group, groups)['name']
-        group_posts = posts.find({'$query':{'group': group_name}, '$orderby':{'date':-1}})
+        group_name = get_group(group, groups, errors)['name']
+        group_posts = posts.find({'group': group_name}).sort("date", -1)
     except:
         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
+        return
         
     return group_posts
 
@@ -220,6 +224,7 @@ def get_posts_from_user(user: User, users: collection, posts: collection, errors
         user_posts =  posts.find({'author': user_id})
     except:
         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
+        return
     
     return user_posts
 
@@ -233,6 +238,8 @@ def get_posts(posts: collection, errors: dict):
         posts_docs = posts.find()
     except:
         errors["message"] = "Couldn't perform this action. Please try again later"
+        return
+    
     return posts_docs
 
 """
@@ -244,6 +251,7 @@ def get_post_by_id(id: ObjectId, posts: collection):
         post = posts.find_one({'_id': id})
     except:
         print('An exception occurred')
+        return
     
     return post
 
@@ -259,6 +267,7 @@ def get_group(group: Group, groups: collection, errors: dict):
         group = groups.find_one({'name': group.name})
     except:
         errors["message"] = "Couldn't perform this action. Please try again later"
+        return
     return group 
 
 def get_groups(groups: collection, errors: dict):
@@ -271,6 +280,7 @@ def get_groups(groups: collection, errors: dict):
         groups = groups.find()      
     except:
         errors["message"] = "Couldn't perform this action. Please try again later"
+        return
     return groups
 
 def get_group_by_id(id: ObjectId, groups: collection, errors: dict):
@@ -284,6 +294,7 @@ def get_group_by_id(id: ObjectId, groups: collection, errors: dict):
         group = groups.find_one({'_id': id})
     except:
         errors["message"] = "Couldn't perform this action. Please try again later"
+        return
     return group   
 
 

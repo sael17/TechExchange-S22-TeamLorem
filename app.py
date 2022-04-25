@@ -592,7 +592,12 @@ def get_group(group_name):
     if errors['message']:
         return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following, error=errors['message'])
 
+    groups_to_view = model.get_groups(groups, errors)
     group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
+    
+    if errors['message']:
+        return render_template('groups.html', session=session, groups=groups_to_view, error=errors['message']) 
+    
     following = model.following(current_user, users)
     
     result = []
