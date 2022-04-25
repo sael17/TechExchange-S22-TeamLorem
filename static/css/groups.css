@@ -35,7 +35,6 @@ a.group-name:hover {
 .group-creator {
     color: var(--color-black);
     text-align: center;
-    text-transform: capitalize;
     text-decoration: underline;
     font-size: large;
     font-family: revert;
