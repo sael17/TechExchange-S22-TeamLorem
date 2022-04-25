@@ -332,24 +332,24 @@ def account():
         return render_template("account.html", session=session,
         firstname=user_doc["firstname"],lastname=user_doc["lastname"],
         bio=user_doc["bio"],password=user_doc["password"],
-        email=user_doc["email"],username=user_doc["username"],profile_pic=user_doc["profile_picture"],
+        email=user_doc["email"],username=user_doc["username"],profile_pic=user_doc["profile_pic"],
         following_count = following_count, followers_count = followers_count,posts=result)
 
 
      # load account info with the one prev found in the user's document
     else:
-        try:
+        
             user_doc = users.find_one({"username":current_user})
             return render_template("account.html", session=session,
             firstname=user_doc["firstname"],lastname=user_doc["lastname"],
             bio=user_doc["bio"],password=user_doc["password"],
             email=user_doc["email"],username=user_doc["username"],posts=result,
-            profile_pic=user_doc["profile_picture"],following_count = following_count, 
+            profile_pic=user_doc["profile_pic"],following_count = following_count, 
             followers_count = followers_count)
 
-        except:
-            return render_template("account.html",session=session,firstname="",lastname="",bio="",
-            password="******")
+        # except:
+        #     return render_template("account.html",session=session,firstname="",lastname="",bio="",
+        #     password="******")
     
 """
 Allows the user to reset or change their current password to a new one
@@ -480,7 +480,7 @@ def change_profile_pic():
                     error_message="URL is not a valid image URL! Please use a correct URL")
                
                 # set the new value of the email
-                newvalue = {"$set": { "profile_picture":profile_picture }}
+                newvalue = {"$set": { "profile_pic":profile_picture }}
                 # validate the passwords match
                 pw_from_db = current_user["password"]
                 form_pw = request.form["password"].encode("utf-8")

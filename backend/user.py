@@ -45,6 +45,7 @@ class User:
         self.canModerate = False
         self.following = []
         self.followers = []
+        self.profile_picture = "https://images.unsplash.com/photo-1529335764857-3f1164d1cb24?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8Y2FydG9vbnxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=800&q=60"
 
     def __str__(self) -> str:
         return "Email: {}'\n' " + "Username: {}'\n' " + "Password: {}".format(self.email,
@@ -83,6 +84,10 @@ class User:
             # "password":self.getPW()
             # comment this for testing
             "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt),
+            "firstname":"FirstName",
+            "lastname":"LastName",
+            "bio":"",
             "following":self.followers,
-            "followers":self.following
+            "followers":self.following,
+            "profile_pic":self.profile_picture
         }
