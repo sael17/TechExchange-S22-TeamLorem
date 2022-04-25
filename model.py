@@ -94,18 +94,6 @@ def create_post(post: Post, posts: collection, errors: dict):
     except:
         errors["message"] = "Could not create a Post at the moment."
 
-# def create_post_instance(author, group, content, date, image):
-    
-#     try:
-#         post = Post(author, group, content, date, image)
-#         return post
-#     except TypeError:
-#         # TODO: return error message for TypeError
-#         pass
-#     except ValueError:
-#         # TODO: return error message for ValueError
-#         pass
-
 '''
 CREATE group
 '''
@@ -122,13 +110,14 @@ def add_group(group: Group, groups: collection, errors: dict):
 
     # Check for an existing group
     try:
-      existing_group = groups.find_one({'name': group.name})
+      existing_groups = get_groups(groups)
     except:
       errors["message"] = "Couldn't perform this action. Please try again later"
     
-    if existing_group:
-        errors["message"] = f'There already exists a group named "{group.name}"'
-        return
+    for existing in existing_groups:        
+        if existing['name'].lower() == group.name.lower():
+            errors["message"] = f'There already exists a group named "{existing["name"]}"'
+            return
     
     # DB insert handler
     try:
@@ -164,25 +153,37 @@ def get_user_by_id(id: ObjectId, users: collection):
 
     return user
 
+def following(username: str, users:collection):
+    '''
+    Get's a list of the usernames that the current user follows
+    '''
+    user_info = users.find_one({'username':username})
+    result = []
+    for user_id in user_info['following']:
+        result.append(users.find_one({'_id':user_id})['username'])
+    return result
+
+
 '''
 READ post
 '''
-# def get_posts_from_group(group: Group, posts: collection, errors: dict):
-    
-#     group_posts = []
-#     try:
-#         post_ids = group.posts # collection of posts IDs
-#         for post_id in post_ids:
-#             group_posts.append(posts.find_one({'_id':post_id}))
-#     except:
-#         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
-    
-#     return group_posts
+def get_recent_posts(username: str, users:collection, posts:collection):
+    '''
+    Gets the most recent posts of the people the user follows
+    '''
+    current_user = users.find_one({'username':username})
+    follow = current_user['following']
+    result = []
+    for user_id in follow:
+        recent_post = posts.find_one({'author':user_id})
+        recent_post = Post.from_document(recent_post)
+        recent_post.author = get_user_by_id(user_id, users)['username']
+        result.append(recent_post)
+    return result
 
-# Alternate method
 def get_posts_from_group(group: Group, groups:collection, posts: collection, errors: dict):
     try:
-        group_name = get_group(group, groups)['name']
+        group_name = get_group(group, groups, errors)['name']
         group_posts = posts.find({'group': group_name})
     except:
         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
@@ -200,13 +201,12 @@ def get_posts_from_user(user: User, users: collection, posts: collection, errors
     return user_posts
 
 
-def get_posts(posts: collection):
+def get_posts(posts: collection, errors: dict):
     
     try:
         posts_docs = posts.find()
     except:
-        # TODO:
-        print('An exception occurred')
+        errors["message"] = "Couldn't perform this action. Please try again later"
     return posts_docs
 
 def get_post_by_id(id: ObjectId, posts: collection):
@@ -221,20 +221,7 @@ def get_post_by_id(id: ObjectId, posts: collection):
 '''
 READ group
 '''
-def get_groups(groups: collection):
-    """Retrieves every group available
-
-    Args:
-        groups (collection): Reference to the groups collection from the DB
-    """
-    try:
-        groups = groups.find()      
-    except:
-        # TODO:
-        print('An exception occurred')
-    return groups
-
-def get_group(group: Group, groups: collection):
+def get_group(group: Group, groups: collection, errors: dict):
     """Gets a specific group from the DB by name
 
     Args:
@@ -244,11 +231,22 @@ def get_group(group: Group, groups: collection):
     try:
         group = groups.find_one({'name': group.name})
     except:
-        # TODO:
-        print('An exception occurred')
+        errors["message"] = "Couldn't perform this action. Please try again later"
     return group 
 
-def get_group_by_id(id: ObjectId, groups: collection):
+def get_groups(groups: collection, errors: dict):
+    """Retrieves every group available
+
+    Args:
+        groups (collection): Reference to the groups collection from the DB
+    """
+    try:
+        groups = groups.find()      
+    except:
+        errors["message"] = "Couldn't perform this action. Please try again later"
+    return groups
+
+def get_group_by_id(id: ObjectId, groups: collection, errors: dict):
     """Gets a specific group from the DB by its id
 
     Args:
@@ -258,8 +256,7 @@ def get_group_by_id(id: ObjectId, groups: collection):
     try:
         group = groups.find_one({'_id': id})
     except:
-        # TODO:
-        print('An exception occurred')
+        errors["message"] = "Couldn't perform this action. Please try again later"
     return group   
 
 '''
@@ -293,26 +290,4 @@ DELETE post
 DELETE group
 '''
 
-'''
-Get's a list of the usernames that the current user follows
-'''
-def following(username: str, users:collection):
-    user_info = users.find_one({'username':username})
-    result = []
-    for user_id in user_info['following']:
-        result.append(users.find_one({'_id':user_id})['username'])
-    return result
 
-'''
-Gets the most recent posts of the people the user follows
-'''
-def get_recent_posts(username: str, users:collection, posts:collection):
-    current_user = users.find_one({'username':username})
-    follow = current_user['following']
-    result = []
-    for user_id in follow:
-        recent_post = posts.find_one({'author':user_id})
-        recent_post = Post.from_document(recent_post)
-        recent_post.author = get_user_by_id(user_id, users)['username']
-        result.append(recent_post)
-    return result

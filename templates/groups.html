@@ -9,6 +9,15 @@
 {% block content %}
 <h1>GROUPS</h1>
 
+{% if error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div>
+        {{error}}
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}  
+
 <!-- Button to toggle display for #create-group-form  -->
 <div class="container">
     <button class="btn toggle-form-btn" data-bs-toggle="collapse" data-bs-target="#create-group-form" onclick="toggleText(this)">Create a Group +</button>

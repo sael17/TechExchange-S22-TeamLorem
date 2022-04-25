@@ -12,8 +12,15 @@
     <p class="group-creator">by: {{ group.creator }}</p>
 </div>
 
-<!-- TODO: render this only if the user is logged in -->
-<!-- TODO: add validation for text area -->
+{% if error %}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <div>
+        {{error}}
+    </div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+{% endif %}  
+
 <div class="container mt-3">
     <form action="/post" method="post">
         <textarea class="post-input" name="content" rows="3" placeholder="What's on you mind today?" maxlength="300" required></textarea>
