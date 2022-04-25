@@ -112,13 +112,13 @@ def index():
             recent_posts = model.get_recent_posts(current_user, users, posts)
             if recent_posts:
                 return render_template('index.html', recent_posts=recent_posts)
-            return render_template('index.html')
+            return render_template('index.html', no_posts=True)
 
         else:
             return redirect(url_for('signup'))
         
     else:
-        return render_template('index.html',error='There method is not supported')
+        return render_template('index.html', error='There method is not supported')
 
 
 # -- GOOGLE API Routes -- 
@@ -599,6 +599,7 @@ def get_group(group_name):
     for post in group_posts:
         post_instance = Post.from_document(post)
         post_instance.author = model.get_user_by_id(post_instance.author, users)['username']
+        post_instance.date = post_instance.date.strftime('%Y %m %d')
         result.append(post_instance)
         
     return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following, error=errors['message'])
