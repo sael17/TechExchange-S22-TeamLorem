@@ -106,7 +106,9 @@
                     </div>
 
                     <div class="delete-account">
-                        <button class="open-button" onclick="openForm()">Delete Account</button>
+                        <form action="{{ url_for('delete_account') }}" method="post">
+                            <button type="submit" class="open-button" onclick="openForm()">Delete Account</button>
+                        </form>
                     </div>
                 </div>
             </div>
