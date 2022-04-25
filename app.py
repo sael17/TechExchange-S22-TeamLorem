@@ -26,7 +26,6 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 from random import randint, random
 from datetime import date
-from bson import ObjectId
 
 import config
 import datetime
@@ -51,7 +50,11 @@ if os.environ.get('DEV_MODE') == '1':
     app.config.from_object(config.DevConfig)
 else:
     app.config.from_object(config.ProdConfig)
-    
+
+# -- Session config --
+app.config["SESSION_PERMANENT"] = True
+app.config["SESSION_TYPE"] = "filesystem"
+
 # -- Mongo Section -- 
 
 # Name of database
@@ -254,6 +257,10 @@ Returns:
 # this router shall be only available if a user is logged in
 def account():
     errors = {"message":""}
+    
+    if not session.get('username'):
+        return redirect(url_for('login'))
+    
     current_user = session["username"]
     user_doc = users.find_one({"username":current_user})
     # save the current user to modify its info
@@ -537,6 +544,10 @@ def group():
         return render_template('session.html', session=session, sign_up=False, display=True)
     
     groups_to_view = model.get_groups(groups, errors)
+    
+    if errors['message']:
+        return render_template('groups.html', session=session, groups=groups_to_view, error=errors['message'])
+
 
     if request.method == 'POST':
         new_group = Group.from_document({
