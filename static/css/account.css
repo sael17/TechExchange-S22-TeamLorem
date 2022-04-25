@@ -345,3 +345,7 @@ label {
 	margin-top: 10rem !important;
 	margin: 0 auto;
 }
+
+#posts{
+	background-color: var(--color-primary) !important;
+}
