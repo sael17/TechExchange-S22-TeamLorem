@@ -21,14 +21,13 @@ img{
 }
 
 .date{
-    float:right;
+    float: right;
     margin-right: 4%;
 }
 
-
 @media screen and (max-width:991px){
     img{
-        width:40%;
+        width:40% !important;
     }
     .container{
         width:75% !important;
