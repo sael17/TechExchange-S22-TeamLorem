@@ -80,6 +80,7 @@ test_groups = mongo.db.test_group
 
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
+# Client ID and Info to use with the API
 GOOGLE_CLIENT_ID = "654704100832-apsssepjo2lgl9iqine185m0faa8lj7t.apps.googleusercontent.com"
 client_secrets_file = os.path.join(pathlib.Path(__file__).parent, "client_secret.json")
 
@@ -89,13 +90,16 @@ flow = Flow.from_client_secrets_file(
     redirect_uri="http://127.0.0.1:5000/callback"
 )
 
+"""
+Main Route of the page where the posts from the groups the user is part of and the users he or she
+follows are displayed
 
+"""
 @app.route("/")
 @app.route("/index",methods=["GET","POST"])
 def index():
     if request.method == "POST":
         if request.form["credential"]:
-            # return request.form["credential"]
             try:
                 decoded = jwt.decode(request.form["credential"],verify=False)
                 return decoded["email"]
@@ -108,21 +112,26 @@ def index():
             recent_posts = model.get_recent_posts(current_user, users, posts)
             if recent_posts:
                 return render_template('index.html', recent_posts=recent_posts)
-            return render_template('index.html')
+            return render_template('index.html', no_posts=True)
 
         else:
             return redirect(url_for('signup'))
         
     else:
-        return render_template('index.html',error='There method is not supported')
+        return render_template('index.html', error='There method is not supported')
 
 
 # -- GOOGLE API Routes -- 
+
+"""
+Route that makes a user base in the the jwt document returned by the Google API
+It also generate a basic username for the user 
+
+"""
 @app.route("/signup/google", methods=["GET","POST"])
 def google_signup():
     if request.method == "POST":
         if request.form["credential"]:
-            # return request.form["credential"]
             try:
                 decoded = jwt.decode(request.form["credential"],verify=False)
                 decoded_email = decoded["email"]
@@ -140,6 +149,10 @@ def google_signup():
         return render_template("session.html",session=session,sign_up = True, 
         google_signup = True, display=True)
 
+
+"""
+Route that allows the user to log in with his google account
+"""
 @app.route("/login/google",methods=["GET","POST"])
 def google_login():
     if request.method == "POST":
@@ -160,6 +173,9 @@ def google_login():
             
 
 # -- Normal Routes -- 
+"""
+Route that allows the user to create an accoun in the DB
+"""
 @app.route("/signup",methods=["GET","POST"])
 def signup():
     errors = {"message":''}
@@ -185,6 +201,9 @@ def signup():
         return render_template("session.html",session=session,sign_up=True,display=True)
 
 
+"""
+Route that allows the user to log in into his accoun in the DB
+"""
 @app.route("/login", methods=["GET","POST"])
 def login():
     errors = {"message":""}
@@ -393,12 +412,18 @@ def change_email():
             return render_template("update_account.html", session=session, error_message="Username not found",
             change_email=True)
 
+
+"""
+Route that allows the user to change his account username, if sucessful
+
+Returns -> it renders the page with a message error if an error occurs, otherwise it 
+redirects to the account page
+"""
 @app.route("/change/username",methods=["GET","POST"])
 def change_username():
     if request.method == "GET":
         return render_template("update_account.html", session=session,change_username=True)
     else:
-        # update old email with new email
         current_user = users.find_one({"username":session["username"]})
         if current_user:
             email = request.form["email"]
@@ -408,13 +433,13 @@ def change_username():
                     return render_template("update_account.html", session=session, error_message="Incorrect User",
                     change_username=True)
             
-                # set the new value of the email
+                # set the new value of the username
                 newvalue = {"$set": { "username": new_username}}
                 # validate the passwords match
                 pw_from_db = current_user["password"]
                 form_pw = request.form["password"].encode("utf-8")
                 if bcrypt.checkpw(form_pw,pw_from_db):
-                    # update user's old email with new email
+                    # update user's old username with new username
                     users.update_one({"username":current_user["username"]}, newvalue)
                     session["username"] = new_username
                      # go back to account page
@@ -425,6 +450,13 @@ def change_username():
         else:
             return render_template("update_account.html", session=session, error_message="Username not found",
             change_username=True)
+
+"""
+Route that allows the user to change his profile picture, if sucessful
+
+Returns -> it renders the page with a message error if an error occurs, otherwise it 
+redirects to the account page
+"""
 
 @app.route("/change/profilepic",methods=["POST","GET"])
 def change_profile_pic():
@@ -572,6 +604,7 @@ def get_group(group_name):
     for post in group_posts:
         post_instance = Post.from_document(post)
         post_instance.author = model.get_user_by_id(post_instance.author, users)['username']
+        post_instance.date = post_instance.date.strftime('%Y %m %d')
         result.append(post_instance)
         
     return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following, error=errors['message'])

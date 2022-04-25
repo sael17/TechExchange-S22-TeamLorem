@@ -41,6 +41,7 @@ def authenticate_user(user:User,users:collection,errors:dict):
     else:
         errors["message"] = "Incorrect User/User does not exist."
 
+
 # -- MONGODB CRUD Functions --
 
 '''
@@ -131,6 +132,11 @@ def add_group(group: Group, groups: collection, errors: dict):
 READ user
 """
 
+
+"""
+    Get User from the DB by username
+"""
+
 def get_user(user: User, users: collection):
     try:
         user = users.find_one({'username': user.username})
@@ -138,6 +144,11 @@ def get_user(user: User, users: collection):
         print('An exception occurred')
         return
     return user
+
+
+"""
+    Get User from the DB by Email
+"""
 
 def get_user_by_email(user: User, users: collection):
     try:
@@ -148,6 +159,10 @@ def get_user_by_email(user: User, users: collection):
 
     return user
 
+"""
+    Get User from the DB by ID
+"""
+
 def get_user_by_id(id: ObjectId, users: collection):
     try:
         user = users.find_one({'_id': id})
@@ -156,6 +171,7 @@ def get_user_by_id(id: ObjectId, users: collection):
         return
 
     return user
+
 
 def following(username: str, users:collection):
     '''
@@ -168,9 +184,7 @@ def following(username: str, users:collection):
     return result
 
 
-'''
-READ post
-'''
+
 def get_recent_posts(username: str, users:collection, posts:collection):
     '''
     Gets the most recent posts of the people the user follows
@@ -185,16 +199,23 @@ def get_recent_posts(username: str, users:collection, posts:collection):
         result.append(recent_post)
     return result
 
+"""
+Method that returns all the posts from a specific group
+"""
+
 def get_posts_from_group(group: Group, groups:collection, posts: collection, errors: dict):
     try:
         group_name = get_group(group, groups, errors)['name']
-        print(group_name)
-        group_posts = posts.find({'group': group_name})
+        group_posts = posts.find({'group': group_name}).sort("date", -1)
     except:
         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
         return
         
     return group_posts
+
+"""
+Method that returns all the posts from a specific user
+"""
 
 def get_posts_from_user(user: User, users: collection, posts: collection, errors: dict):
     
@@ -207,6 +228,9 @@ def get_posts_from_user(user: User, users: collection, posts: collection, errors
     
     return user_posts
 
+"""
+Method that returns all the posts from the DB
+"""
 
 def get_posts(posts: collection, errors: dict):
     
@@ -218,6 +242,9 @@ def get_posts(posts: collection, errors: dict):
     
     return posts_docs
 
+"""
+Method that returns all the posts from a specific ID
+"""
 def get_post_by_id(id: ObjectId, posts: collection):
     
     try:
@@ -228,9 +255,7 @@ def get_post_by_id(id: ObjectId, posts: collection):
     
     return post
 
-'''
-READ group
-'''
+
 def get_group(group: Group, groups: collection, errors: dict):
     """Gets a specific group from the DB by name
 
@@ -272,27 +297,9 @@ def get_group_by_id(id: ObjectId, groups: collection, errors: dict):
         return
     return group   
 
-'''
-UPDATE user
-'''
 
 '''
-UPDATE post
-'''
-
-'''
-UPDATE group
-'''
-# def update_posts_from_group(group: Group, post: Post, groups: collection, posts: collection, errors: dict):
-    
-#     try:
-#         post_to_group = get_post
-        
-#     except:
-#         print('An exception occurred')
-
-'''
-DELETE user
+Delete a user from the DB (hard delete)
 '''
 def delete_user(user: User, users: collection, errors: dict):
     try:
@@ -301,7 +308,7 @@ def delete_user(user: User, users: collection, errors: dict):
         errors["message"] = "Couldn't perform this action. Please try again later"
 
 '''
-DELETE post
+Delete all posts wherre the delete used was present
 '''
 def delete_posts_from_user(user: User,users: collection, posts: collection, errors: dict):
     try:
@@ -312,8 +319,20 @@ def delete_posts_from_user(user: User,users: collection, posts: collection, erro
         errors["message"] = "Couldn't perform this action. Please try again later"
 
     
-'''
-DELETE group
-'''
 
 
+
+'''
+Gets the most recent posts of the people the user follows
+'''
+def get_recent_posts(username: str, users:collection, posts:collection):
+    current_user = users.find_one({'username':username})
+    follow = current_user['following']
+    result = []
+    for user_id in follow:
+        recent_post = posts.find_one({'$query':{'author':user_id}, '$orderby': {'date':-1}})
+        recent_post = Post.from_document(recent_post)
+        recent_post.author = get_user_by_id(user_id, users)['username']
+        recent_post.date = recent_post.date.strftime('%Y %m %d')
+        result.append(recent_post)
+    return result
