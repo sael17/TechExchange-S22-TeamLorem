@@ -26,7 +26,6 @@ from google_auth_oauthlib.flow import Flow
 from pip._vendor import cachecontrol
 from random import randint, random
 from datetime import date
-from bson import ObjectId
 
 import config
 import datetime
@@ -51,7 +50,11 @@ if os.environ.get('DEV_MODE') == '1':
     app.config.from_object(config.DevConfig)
 else:
     app.config.from_object(config.ProdConfig)
-    
+
+# -- Session config --
+app.config["SESSION_PERMANENT"] = False
+app.config["SESSION_TYPE"] = "filesystem"
+
 # -- Mongo Section -- 
 
 # Name of database
