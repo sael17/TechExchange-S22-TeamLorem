@@ -2,7 +2,7 @@
 
 {% block styles %}
 <link rel="stylesheet" href="/static/css/posts.css">
-<link rel="stylesheet" href="static/css/groups.css">
+<link rel="stylesheet" href="/static/css/groups.css">
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
 <!-- TODO: add validation for text area -->
 <div class="container mt-3">
     <form action="/post" method="post">
-        <textarea name="content" rows="8" placeholder="What's on you mind today?"></textarea>
+        <textarea class="post-input" name="content" rows="8" placeholder="What's on you mind today?"></textarea>
         <input type="hidden" name="group_name" value="{{group.name}}">
         <button type="submit" class="btn btn-style mb-3">Add Post</button>
     </form>
@@ -32,11 +32,18 @@
             <p>{{ post.group }}</p>
         </div>
         <div class="col-md-10 post-content">
+            <p class="date">{{ post.date }}</p>
             <h2>{{ post.author }}</h2>
             <p>{{ post.content }}</p>
-            <p class="date">{{ post.date }}</p>
         </div>
     </div>
+    {% if current_user != post.author and post.author not in following %}
+    <form action="/follow" method="post">
+        <input type="hidden" name="group" value="{{ post.group }}">
+        <input type="hidden" name="user_to_be_followed" value="{{ post.author }}">
+        <button type="submit" class="btn btn-style mb-3">Follow</button> 
+    </form>
+    {% endif %}
 </div>
 {% endfor %}
 
