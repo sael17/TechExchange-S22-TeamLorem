@@ -238,6 +238,10 @@ Returns:
 # this router shall be only available if a user is logged in
 def account():
     errors = {"message":""}
+    
+    if not session.get('username'):
+        return redirect(url_for('login'))
+    
     current_user = session["username"]
     user_doc = users.find_one({"username":current_user})
     # save the current user to modify its info
