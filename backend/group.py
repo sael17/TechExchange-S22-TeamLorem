@@ -11,7 +11,7 @@ class Group():
     
     def __init__(self, creator: ObjectId, name: str, about: str, date_created):
         self.creator = creator
-        self.name = self.strip_spaces(name)
+        self.name = name
         self.about = about
         self.date_created = date_created
         
@@ -34,10 +34,3 @@ class Group():
             "date_created":self.date_created
         }
 
-    """
-     Method that removes spaces 
-    """
-
-    def strip_spaces(self, name):
-        words = split(' ', name)
-        return ''.join(words)        
