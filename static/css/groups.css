@@ -16,6 +16,7 @@
 .group-name {
     color: black;
     text-decoration: none;
+    margin: 0 auto !important;
 }
 
 a.group-name:hover {
@@ -26,14 +27,25 @@ a.group-name:hover {
     color: black;
 }
 
+.create-group-title{
+    text-align: center;
+    letter-spacing: .1rem;
+}
+
 .group-creator {
-    color: grey;
+    color: var(--color-black);
+    text-align: center;
+    text-transform: capitalize;
+    text-decoration: underline;
+    font-size: large;
+    font-family: revert;
+
 }
 
 /* Create a Group */
 
 .toggle-form-btn {
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-primary);
     font-size: 25px !important;
     height: 55px;
 }
@@ -56,10 +68,12 @@ textarea.post-input, textarea.group-info, .group-name-input {
     border: 0px !important;
     outline: 0px !important;
     resize: none !important;
-    background: var(--color-primary-dark) !important;
+    background: var(--color-secondary) !important;
     padding: 2% !important;
     border-radius: 15px 50px !important;
     margin: auto !important;
+    color: var(--color-black);
+    text-align: center;
 }
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
@@ -70,6 +84,15 @@ textarea.post-input, textarea.group-info, .group-name-input {
 .btn-style{
     display: flex !important;
     margin: auto;
-    background-color: var(--color-secondary-dark)!important;
-    /* color: white !important; */
+    background-color: var(--color-secondary)!important;
+    color: var(--color-black) !important;
+    border: 2px solid var(--color-black) !important;
+}
+
+#group-name{
+    border: 3px solid var(--color-black) !important;
+}
+
+#group-name::placeholder{
+    color: var(--color-black) !important;
 }

@@ -28,7 +28,7 @@ main{
 }
 
 body{
-    background-color: var(--color-secondary-dark)!important;
+    background-color: var(--color-primary)!important;
     font-family: 'Lato', sans-serif !important;
     font-weight: 400;
 }
@@ -38,7 +38,7 @@ ul{
 }
 
 .navbar{
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-secondary);
     padding: 2% !important;
     margin-bottom: 3%;
 }
@@ -50,7 +50,7 @@ ul{
 
 .footer-content{
     padding: 2%;
-    background-color: var(--color-primary-dark);
+    background-color: var(--color-secondary);
     text-align: center;
     position: absolute;
     width: 100%;
