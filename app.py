@@ -327,11 +327,12 @@ def account():
             return render_template("account.html", session=session,
             firstname=user_doc["firstname"],lastname=user_doc["lastname"],
             bio=user_doc["bio"],password=user_doc["password"],
-            email=user_doc["email"],username=user_doc["username"],posts=result)
+            email=user_doc["email"],username=user_doc["username"],posts=result,
+            profile_pic=user_doc["profile_picture"])
 
         except:
             return render_template("account.html",session=session,firstname="",lastname="",bio="",
-            password="******",posts=result)
+            password="******")
     
 
 
@@ -439,6 +440,50 @@ def change_username():
             return render_template("update_account.html", session=session, error_message="Username not found",
             change_username=True)
 
+@app.route("/change/profilepic",methods=["POST","GET"])
+def change_profile_pic():
+    if request.method == "GET":
+        return render_template("update_account.html",session=session,change_img=True)
+    else:  
+        current_user = users.find_one({"username":session["username"]})
+        if current_user:
+            email = request.form["email"]
+            if current_user["email"] == email:
+                profile_picture = request.form["image_url"]
+               #Fetching the image_url from the user to check if it gives us headers        
+                try:
+                    url = profile_picture
+                    response = requests.get(url)
+                except:
+                    # Handle error
+                    return render_template("update_account.html",session=session,change_img=True,
+                    error_message="Something went wrong with your image URL")
+                
+                # Validating image_url to see if it's an image
+                if response.headers.get('content-type') not in ['image/png', 'image/jpeg']:
+                    return render_template("update_account.html",session=session,change_img=True,
+                    error_message="URL is not a valid image URL! Please use a correct URL")
+               
+                # set the new value of the email
+                newvalue = {"$set": { "profile_picture":profile_picture }}
+                # validate the passwords match
+                pw_from_db = current_user["password"]
+                form_pw = request.form["password"].encode("utf-8")
+                if bcrypt.checkpw(form_pw,pw_from_db):
+                    # update user's old email with new email
+                    users.update_one({"username":current_user["username"]}, newvalue)
+                     # go back to account page
+                    return redirect("/account")
+                else:
+                    return render_template("update_account.html",session=session,
+                    error_message="Incorrect Password",change_img=True)
+            else:
+                return render_template("update_account.html", session=session, error_message="Incorrect Email",
+                change_img=True)
+        else:
+            return render_template("update_account.html", session=session, error_message="Incorrect User",
+            change_img=True)
+    
 
 """
 Delete the users account from the users data base 
@@ -449,7 +494,6 @@ and it is redirected to the main page (index.html)
 @app.route("/delete/account",methods=["GET","POST"])
 def delete_account():
     if request.method == "POST":
-        users = mongo.db.users
         users.delete_one({"username":session["username"]})
         return redirect("/logout")
     else:
