@@ -100,17 +100,18 @@ def index():
                 return "Error"
 
     elif request.method == 'GET':
-        pass
+        current_user = session.get('username')
+        if current_user:
+            recent_posts = model.get_recent_posts(current_user, users, posts)
+            if recent_posts:
+                return render_template('index.html', recent_posts=recent_posts)
+            return render_template('index.html')
+
+        else:
+            return redirect(url_for('signup'))
         
     else:
-        data = model.get_posts(posts)
-        result = []
-        for entry in data:
-            # result.append(model.create_post(author = entry['author'], group = entry['group'], content = entry['content'], date = entry['date'], image = entry['group_image']))
-            result.append(Post.from_document(entry))
-            if result:
-                return render_template('index.html', home_posts=result)
-    return render_template('index.html',error='There are no posts available')
+        return render_template('index.html',error='There method is not supported')
 
 
 # -- GOOGLE API Routes -- 
@@ -332,7 +333,8 @@ def account():
             return render_template("account.html", session=session,
             firstname=user_doc["firstname"],lastname=user_doc["lastname"],
             bio=user_doc["bio"],password=user_doc["password"],
-            email=user_doc["email"],username=user_doc["username"],posts=result)
+            email=user_doc["email"],username=user_doc["username"],posts=result,
+            profile_pic=user_doc["profile_picture"])
 
         except:
             return render_template("account.html",session=session,firstname="",lastname="",bio="",
@@ -447,8 +449,46 @@ def change_username():
 @app.route("/change/profilepic",methods=["POST","GET"])
 def change_profile_pic():
     if request.method == "GET":
-        pass
-
+        return render_template("update_account.html",session=session,change_img=True)
+    else:  
+        current_user = users.find_one({"username":session["username"]})
+        if current_user:
+            email = request.form["email"]
+            if current_user["email"] == email:
+                profile_picture = request.form["image_url"]
+               #Fetching the image_url from the user to check if it gives us headers        
+                try:
+                    url = profile_picture
+                    response = requests.get(url)
+                except:
+                    # Handle error
+                    return render_template("update_account.html",session=session,change_img=True,
+                    error_message="Something went wrong with your image URL")
+                
+                # Validating image_url to see if it's an image
+                if response.headers.get('content-type') not in ['image/png', 'image/jpeg']:
+                    return render_template("update_account.html",session=session,change_img=True,
+                    error_message="URL is not a valid image URL! Please use a correct URL")
+               
+                # set the new value of the email
+                newvalue = {"$set": { "profile_picture":profile_picture }}
+                # validate the passwords match
+                pw_from_db = current_user["password"]
+                form_pw = request.form["password"].encode("utf-8")
+                if bcrypt.checkpw(form_pw,pw_from_db):
+                    # update user's old email with new email
+                    users.update_one({"username":current_user["username"]}, newvalue)
+                     # go back to account page
+                    return redirect("/account")
+                else:
+                    return render_template("update_account.html",session=session,
+                    error_message="Incorrect Password",change_img=True)
+            else:
+                return render_template("update_account.html", session=session, error_message="Incorrect Email",
+                change_img=True)
+        else:
+            return render_template("update_account.html", session=session, error_message="Incorrect User",
+            change_img=True)
     
 
 """
@@ -467,11 +507,6 @@ def delete_account():
             return redirect(url_for('login'))
         return render_template("account.html")
 
-
-
-
-
-#TODO - If there are no posts and the user is not logged in it shows up blank, handle this edge case
 """
 ROUTE /group
 METHODS: GET, POST
@@ -505,20 +540,14 @@ def group():
         
         return render_template('groups.html', session=session, groups=groups_to_view)
 
+
+'''
+Renders the post associated with the group the user selected
+'''
 @app.route('/group/<group_name>')
 def get_group(group_name):
     errors = {'message': None}
-    
-    # #TODO: get author from the session
-    # is_active = False
-    # current_user = session.get('username')
-    
-    # # even though usernames are unique we use find one because if not it returns a cursor object
-    # author = users.find_one({'username':current_user})
-    # if author:
-    #     is_active = True
-
-    
+        
     if not session.get('username'):
         return render_template('session.html', session=session, sign_up=False, display=True)
 
@@ -531,11 +560,11 @@ def get_group(group_name):
         'users': [],
         'posts': []
     })
+
     current_user = session.get('username')
     group_to_view = model.get_group(group_query, groups)
     group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
-    following = model.following(current_user, users)
-    print(following)
+    following = model.following(current_user, users, )
     
     result = []
     for post in group_posts:
@@ -547,6 +576,10 @@ def get_group(group_name):
     
     return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following)
 
+'''
+Inserts the new post into the database and redirects 
+the user to the group where they made the post. 
+'''
 @app.route('/post', methods=['POST'])
 def post():
     errors = {'message': None}
@@ -640,20 +673,23 @@ def post():
 #             }))
 #         return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
 
+
+'''
+If the user is not already following the user they selected then it follows them and updates the user.
+Also adds the current user to the list of followers of the user they just followed 
+'''
 @app.route('/follow', methods=["POST"])
 def follow():
     if request.method == 'POST':
         current_user = session.get('username')
-        print(current_user)
         current_user = users.find_one({'username':current_user})
 
         user_to_be_followed = request.form['user_to_be_followed']
-        print(user_to_be_followed)
         user_to_be_followed = users.find_one({'username':user_to_be_followed})
 
         group_name = request.form['group']
+
         if user_to_be_followed['_id'] not in current_user['following']:
-            print('hi')
             current_user['following'].append(user_to_be_followed['_id'])
             user_to_be_followed['followers'].append(current_user['_id'])
             users.update_one({'_id':current_user['_id']}, {'$set':{'following':current_user['following']}})

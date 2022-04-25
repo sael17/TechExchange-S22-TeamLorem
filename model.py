@@ -293,10 +293,26 @@ DELETE post
 DELETE group
 '''
 
-
+'''
+Get's a list of the usernames that the current user follows
+'''
 def following(username: str, users:collection):
     user_info = users.find_one({'username':username})
     result = []
     for user_id in user_info['following']:
         result.append(users.find_one({'_id':user_id})['username'])
+    return result
+
+'''
+Gets the most recent posts of the people the user follows
+'''
+def get_recent_posts(username: str, users:collection, posts:collection):
+    current_user = users.find_one({'username':username})
+    follow = current_user['following']
+    result = []
+    for user_id in follow:
+        recent_post = posts.find_one({'author':user_id})
+        recent_post = Post.from_document(recent_post)
+        recent_post.author = get_user_by_id(user_id, users)['username']
+        result.append(recent_post)
     return result
