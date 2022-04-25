@@ -44,14 +44,11 @@ class User:
         if username == '' or username.isspace():
             raise ValueError("Username can not be empty")
 
-        if len(username) < 6 or len(username) > 16:
-            raise ValueError("Username must be greater than 6 but less than 16 characters")
+        if len(username) < 6 or len(username) > 60:
+            raise ValueError("Username must be greater than 6 but less than 60 characters")
 
         if password == "" or password.isspace():
             raise ValueError("Password can not be empty")
-
-        if len(password) < 8 or len(password) > 24:
-            raise ValueError("Password must be greater than 8 but less than 24 characters")
 
     
         self.email = email

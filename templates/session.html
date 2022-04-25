@@ -37,14 +37,16 @@
             <div class="input-container">
                 {%if google_signup%}
                 <input type="text" name="username" placeholder="username" required value="{{username}}"
-                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}" minlength="6" maxlength="16">
+                title="username must contain letters, at least one number, at least one 
+                special character and must be between 6 and 60 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,60}" minlength="6" maxlength="60">
 
                 {%else%}
                 <input type="text" name="username" placeholder="username" required
-                title="username must contain letters, at least one number, at least one special character and must be between 6 and 16 characters"
-                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,17}"
-                minlength="6" maxlength="16">
+                title="username must contain letters, at least one number, at least one of 
+                these: @ or $ and must be between 6 and 60 characters"
+                pattern="(?=.*\d)(?=.*[a-z])(?=.*[.@$]).{6,60}"
+                minlength="6" maxlength="60">
                 {%endif%}
             </div>
             {%endif%}
@@ -52,9 +54,10 @@
             <div class="input-container input-container--password">
                 {%if sign_up%}
                 <input type="password" name="password" id="password" 
-                placeholder="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.@$]).{8,25}" 
-                title="password must have at least one uppercase, one lowercase,one number one special character and must  be between 8 and 24 characters"
-                minlength="8" maxlength="24" required>
+                placeholder="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[.@$]).{8,1000}" 
+                title="password must have at least one uppercase, one lowercase,one number 
+                one special character and must at leas be 8 characters long"
+                required>
                 <i class="bi bi-eye-slash" id="togglePassword"></i>
                 {%else%}
                 <input type="password" name="password" id="password" 
