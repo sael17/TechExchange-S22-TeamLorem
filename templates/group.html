@@ -25,9 +25,9 @@
 
 <div class="container mt-3">
     <form action="/post" method="post">
-        <textarea class="post-input" name="content" rows="3" placeholder="What's on you mind today?" maxlength="300" required></textarea>
+        <textarea id="post-textarea" class="post-input" name="content" rows="3" placeholder="What's on you mind today?" maxlength="300" required></textarea>
         <input type="hidden" name="group_name" value="{{group.name}}">
-        <button type="submit" class="btn btn-style mb-3">Add Post</button>
+        <button type="submit" class="btn btn-style mt-3 mb-3">Add Post</button>
     </form>
 </div>
 
@@ -40,14 +40,14 @@
             <img src="/static/img/Page-logo.png" alt="post-img">
             <p>{{ post.group }}</p>
         </div>
-        <div class="col-md-10 post-content">
+        <div id="align-left" class="col-md-10 post-content">
             <p class="date">{{ post.date }}</p>
             <h2>{{ post.author }}</h2>
             <p>{{ post.content }}</p>
         </div>
     </div>
     {% if current_user != post.author and post.author not in following %}
-    <form action="/follow" method="post">
+    <form id="form-style" action="/follow" method="post">
         <input type="hidden" name="group" value="{{ post.group }}">
         <input type="hidden" name="user_to_be_followed" value="{{ post.author }}">
         <button type="submit" class="btn btn-style mb-3">Follow</button> 

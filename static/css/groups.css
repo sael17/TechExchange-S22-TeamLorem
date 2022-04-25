@@ -100,3 +100,20 @@ textarea.post-input, textarea.group-info, .group-name-input {
 textarea{
     border: 3px solid var(--color-black) !important;
 }
+
+#align-left{
+    text-align: left;
+}
+
+#form-style{
+    margin-top: inherit !important;
+}
+
+#post-textarea{
+    width: 100% !important;
+    outline: 0px !important;
+    resize: none !important;
+    background: transparent;
+    border: 0px !important;
+    padding: 2% !important;
+}
