@@ -110,9 +110,9 @@ def add_group(group: Group, groups: collection, errors: dict):
 
     # Check for an existing group
     try:
-      existing_groups = get_groups(groups)
+      existing_groups = get_groups(groups, errors)
     except:
-      errors["message"] = "Couldn't perform this action. Please try again later"
+      errors["message"] = "Couldn't retrieve groups. Please try again later."
       return
     
     for existing in existing_groups:        

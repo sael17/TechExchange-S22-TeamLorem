@@ -512,6 +512,10 @@ def group():
         return render_template('session.html', session=session, sign_up=False, display=True)
     
     groups_to_view = model.get_groups(groups, errors)
+    
+    if errors['message']:
+        return render_template('groups.html', session=session, groups=groups_to_view, error=errors['message'])
+
 
     if request.method == 'POST':
         new_group = Group.from_document({
