@@ -28,6 +28,7 @@ from random import randint, random
 from datetime import date
 from bson import ObjectId
 
+import config
 import datetime
 import bcrypt 
 import certifi
@@ -35,7 +36,6 @@ import google.auth.transport.requests
 import gunicorn # for heroku deployment
 import jwt
 import model
-import secrets
 import os
 import pathlib
 import requests
@@ -43,13 +43,19 @@ import requests
 
 # -- Initialization section --
 app = Flask(__name__)
-app.config['SECRET_KEY'] = secrets.token_hex(nbytes=16)
 
+# -- App config --
+app.config.from_object(config.Config)
+
+if os.environ.get('DEV_MODE') == '1':
+    app.config.from_object(config.DevConfig)
+else:
+    app.config.from_object(config.ProdConfig)
+    
 # -- Mongo Section -- 
 
 # Name of database
-db_name = 'test' if os.environ.get('DB_TEST') == '1' else 'GoalUp'
-app.config['MONGO_DBNAME'] = db_name
+db_name = app.config['MONGO_DBNAME']
 
 # URI of database
 mongodb_password = os.environ.get('MONGO_PASSWORD')
