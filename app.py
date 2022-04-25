@@ -446,7 +446,7 @@ Delete the users account from the users data base
 Redirects to the logout where the account is also cleared from the current session
 and it is redirected to the main page (index.html)
 """
-@app.route("/delete/account",methods=["POST"])
+@app.route("/deleteacc",methods=["POST"])
 def delete_account():
     errors = {'message': None}
     
@@ -465,7 +465,7 @@ def delete_account():
     
     if errors['message']:
         return render_template("account.html", session=session, firstname="", lastname="", bio="", password="******", error=errors['message'])
-    return redirect("logout")
+    return redirect(url_for('logout'))
 
 """
 ROUTE /group
