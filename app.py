@@ -6,6 +6,7 @@ from time import time
 from flask import (
     Flask,
     abort,
+    current_app,
     render_template,
     request,
     redirect,
@@ -80,7 +81,6 @@ flow = Flow.from_client_secrets_file(
 )
 
 
-
 @app.route("/")
 @app.route("/index",methods=["GET","POST"])
 def index():
@@ -92,6 +92,9 @@ def index():
                 return decoded["email"]
             except:
                 return "Error"
+
+    elif request.method == 'GET':
+        pass
         
     else:
         data = model.get_posts(posts)
@@ -145,7 +148,6 @@ def google_login():
         return render_template("session.html",session=session,sign_up = False, google_signup = True, 
         display=True)
             
-
 
 # -- Normal Routes -- 
 @app.route("/signup",methods=["GET","POST"])
@@ -513,9 +515,11 @@ def get_group(group_name):
         'users': [],
         'posts': []
     })
-    
+    current_user = session.get('username')
     group_to_view = model.get_group(group_query, groups)
     group_posts = model.get_posts_from_group(Group.from_document(group_to_view),groups, posts, errors)
+    following = model.following(current_user, users)
+    print(following)
     
     result = []
     for post in group_posts:
@@ -525,7 +529,7 @@ def get_group(group_name):
     
     # TODO: error handling
     
-    return render_template('group.html', session=session, group=group_to_view, posts=result)
+    return render_template('group.html', session=session, group=group_to_view, posts=result, current_user=current_user, following=following)
 
 @app.route('/post', methods=['POST'])
 def post():
@@ -619,3 +623,23 @@ def post():
 #                 post['group_image']
 #             }))
 #         return render_template('groups.html', posts=result, group_id=group_info['_id'], active=is_active)
+
+@app.route('/follow', methods=["POST"])
+def follow():
+    if request.method == 'POST':
+        current_user = session.get('username')
+        print(current_user)
+        current_user = users.find_one({'username':current_user})
+
+        user_to_be_followed = request.form['user_to_be_followed']
+        print(user_to_be_followed)
+        user_to_be_followed = users.find_one({'username':user_to_be_followed})
+
+        group_name = request.form['group']
+        if user_to_be_followed['_id'] not in current_user['following']:
+            print('hi')
+            current_user['following'].append(user_to_be_followed['_id'])
+            user_to_be_followed['followers'].append(current_user['_id'])
+            users.update_one({'_id':current_user['_id']}, {'$set':{'following':current_user['following']}})
+            users.update_one({'_id':user_to_be_followed['_id']}, {'$set':{'followers':user_to_be_followed['followers']}})
+        return redirect(url_for('get_group', group_name=group_name))

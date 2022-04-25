@@ -43,9 +43,8 @@ class User:
         self.__password = password
         self.star_pw = self.pw_to_star(password)
         self.canModerate = False
-        self.followers = defaultdict(list)
-        self.follwing = defaultdict(list)
-        
+        self.following = []
+        self.followers = []
 
     def __str__(self) -> str:
         return "Email: {}'\n' " + "Username: {}'\n' " + "Password: {}".format(self.email,
@@ -83,10 +82,7 @@ class User:
             # uncomment this for testing
             # "password":self.getPW()
             # comment this for testing
-            "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt)
+            "password":bcrypt.hashpw(self.getPW().encode('utf-8'),salt),
+            "following":self.followers,
+            "followers":self.following
         }
-
-  
-
-
-    

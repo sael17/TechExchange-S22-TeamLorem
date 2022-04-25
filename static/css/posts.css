@@ -12,7 +12,6 @@
 
 img{
     border-radius: 50%;
-    float: left;
     max-width: 100%;
 }
 
@@ -23,4 +22,21 @@ img{
 
 .date{
     float:right;
+    margin-right: 4%;
+}
+
+
+@media screen and (max-width:991px){
+    img{
+        width:40%;
+    }
+    .container{
+        width:75% !important;
+    }
+}
+
+@media screen and (max-width:425px){
+    .container{
+        font-size: 0.75rem;
+    }
 }
