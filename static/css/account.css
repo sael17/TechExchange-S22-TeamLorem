@@ -27,6 +27,7 @@ a {
 .container {
 	margin-top: 3rem;
 	text-align: center;	
+	border: none !important;
 }
 
 .row {
@@ -338,4 +339,9 @@ label {
 .followers-text:hover{
   color: var(--color-black);
   border-bottom: 2px solid var(--color-primary-dark);
+}
+
+#go-back{
+	margin-top: 10rem !important;
+	margin: 0 auto;
 }
