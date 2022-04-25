@@ -65,10 +65,9 @@ a.group-name:hover {
 /* Input */
 textarea.post-input, textarea.group-info, .group-name-input {
     width: 100% !important;
-    border: 0px !important;
     outline: 0px !important;
     resize: none !important;
-    background: var(--color-secondary) !important;
+    background: transparent;
     padding: 2% !important;
     border-radius: 15px 50px !important;
     margin: auto !important;
@@ -84,15 +83,20 @@ textarea.post-input, textarea.group-info, .group-name-input {
 .btn-style{
     display: flex !important;
     margin: auto;
-    background-color: var(--color-secondary)!important;
+    background-color: var(--color-primary)!important;
     color: var(--color-black) !important;
     border: 2px solid var(--color-black) !important;
 }
 
-#group-name{
+.form-control{
     border: 3px solid var(--color-black) !important;
+    background-color: var(--color-primary) !important;
 }
 
 #group-name::placeholder{
     color: var(--color-black) !important;
+}
+
+textarea{
+    border: 3px solid var(--color-black) !important;
 }

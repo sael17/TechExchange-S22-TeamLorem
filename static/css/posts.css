@@ -1,11 +1,14 @@
 .container{
-    background-color: var(--color-secondary);
+    background-color: var(--color-secondary) !important;
     color: black;
     border-radius: 15px 50px;
     border: 3px solid black;
+    text-align: center;
 }
 
-
+.container a{
+    margin-top: 1.55rem !important;
+}
 
 .group-info{
     padding:1%;
