@@ -183,7 +183,7 @@ READ post
 def get_posts_from_group(group: Group, groups:collection, posts: collection, errors: dict):
     try:
         group_name = get_group(group, groups)['name']
-        group_posts = posts.find({'group': group_name})
+        group_posts = posts.find({'$query':{'group': group_name}, '$orderby':{'date':-1}})
     except:
         errors['message'] = 'Could not retrieve posts at the moment. Please try again later.'
         
@@ -311,8 +311,9 @@ def get_recent_posts(username: str, users:collection, posts:collection):
     follow = current_user['following']
     result = []
     for user_id in follow:
-        recent_post = posts.find_one({'author':user_id})
+        recent_post = posts.find_one({'$query':{'author':user_id}, '$orderby': {'date':-1}})
         recent_post = Post.from_document(recent_post)
         recent_post.author = get_user_by_id(user_id, users)['username']
+        recent_post.date = recent_post.date.strftime('%Y %m %d')
         result.append(recent_post)
     return result
