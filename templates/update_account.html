@@ -57,10 +57,10 @@
             </div>
 
             <div class="input-container input-container--password">
-                {%if change_username%}
+                {%if change_password%}
                 <h2>Confirm with Old Password</h2>
                 {%else%}
-                <h2>Confirm with Old Password</h2>
+                <h2>Confirm with Password</h2>
                 {%endif%}
                 <input type="password" name="password" id="password" placeholder="password" required>
                 <i class="bi bi-eye-slash" id="togglePassword"></i>
@@ -73,7 +73,7 @@
             </section>
 
             <div class="input-container--login">
-                <input type="submit" value="Sign Up"> 
+                <input type="submit" value="Change"> 
             </div>
         </form>
     </section>
