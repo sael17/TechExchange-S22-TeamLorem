@@ -113,6 +113,7 @@ def add_group(group: Group, groups: collection, errors: dict):
       existing_groups = get_groups(groups)
     except:
       errors["message"] = "Couldn't perform this action. Please try again later"
+      return
     
     for existing in existing_groups:        
         if existing['name'].lower() == group.name.lower():
