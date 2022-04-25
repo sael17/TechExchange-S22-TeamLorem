@@ -1,0 +1,170 @@
+<head>
+    <meta charset="utf-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="/static/css/account.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" >
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" >
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/svg-with-js.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/posts.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-5 user-col">
+                <h2 class="account-section">Account</h2>
+                <div class="row profilepic-row">    
+                    <div class="profilepic">
+                        {%if profile_pic%}
+                        <img class="profilepic__image" src={{profile_pic}} 
+                            width="150" 
+                            height="150" 
+                            alt="Profibild">
+                        {%else%}
+                        <img class="profilepic__image"
+                            src="/static/img/code.jpeg"
+                            width="150" 
+                            height="150" 
+                            alt="Profibild">
+                        {%endif%}
+                        <div class="profilepic__content">
+                            <span class="profilepic__icon"><i class="fas fa-camera"></i></span>
+                            <span class="profilepic__text"><a href="/change/profilepic">Change Photo</a></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row account-row">
+                    <form action="/account" method="post" class="account-settings">
+                        <div class="first-lastnames">
+                            <label class="firstname" for="firstname">First Name</label>
+                            <div class="firstname-input">
+                                {%if firstname%}
+                                <input type="text" class="loggedin" name="firstname" value={{firstname}}>
+                                {%else%}
+                                <input type="text" class="loggedin" name="firstname" placeholder="First Name">
+                                {%endif%}
+                            </div>
+
+                            <label clssname="password-label" for="lastname">Last Name</label>
+                            <div class="lastname-input">
+                                {%if lastname%}
+                                <input type="text" class="loggedin" name="lastname" value={{lastname}}>
+                                {%else%}
+                                <input type="text" class="loggedin" name="lastname" placeholder="Last Name">
+                                {%endif%}
+                            </div>
+                        </div>
+
+                        <div class="textarea-container">
+                            <label class="bio" id="textbox-label" for="bio">Your Bio</label>
+                            {%if bio%}
+                            <textarea class="textbox" name="bio" rows="10" spellcheck="true" wrap="hard" maxlength="140"
+                            >{{bio}}</textarea>
+                            {%else%}
+                            <textarea class="textbox" name="bio" rows="10" spellcheck="true" wrap="hard" maxlength="140"
+                            placeholder="Add a bio"></textarea>
+                            {%endif%}
+                            <span id="textbox-span"><sup>*</sup>0/140 characters</span>
+                        </div>
+                        <input id="submit-input" class="btn" type="submit" value="Save">
+                    </form>
+                </div>
+                
+            
+
+                <h2 class="account-section account-section-settings">Account Information</h2>
+
+                <div class="row account-row">
+                    <div class="user-info">
+                        <h5 class="account-h5">Your email</h5>
+                        {%if email%}
+                        <span class="account-info-span">{{email}}</span>
+                        {%else%}
+                        <span class="account-info-span">john.doe@techexchange.in</span>
+                        {%endif%}
+                        <button class="account-info-btn btn"><a class="change-link" href="/change/email">Change</a></button>
+                    </div>
+
+                    <div class="user-info">
+                        <h5 class="account-h5">Your username</h5>
+                        {%if username%}
+                        <span class="account-info-span">{{username}}</span>
+                        {%else%}
+                        <span class="account-info-span">user@1</span>
+                        {%endif%}
+                        <button class="account-info-btn btn"><a class="change-link" href="/change/username">Change</a></button>
+                    </div>
+                    
+                    <div class="user-info">
+                        <h5 class="account-h5">Your Password</h5>
+                        <span class="account-info-span">*********</span>
+                        <button class="account-info-btn btn"><a class="change-link" href="/change/password">Change</a></button>
+                    </div>
+
+                    <div class="delete-account">
+                        <button class="open-button" onclick="openForm()">Delete Account</button>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col">
+                <h2 class="account-section account-section-posts">Your Posts</h2>
+                <div class="col posts-col">
+                    {%if posts%}
+                    {% for post in posts%}
+                    <div class="container mt-3">
+                        <div class="row">
+                            <div class="col-2 m-auto group-info">
+                                <img src="{{ post.image }}" alt="post-img">
+                                <p>{{post.group }}</p>
+                            </div>
+                            <div class="col-md-10 post-content">
+                                <h2>{{ post.author }}</h2>
+                                <p>{{ post.content }}</p>
+                                <p class="date">{{ post.date }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {%else%}
+                    <div class="row">Create A Post in one of your social groups!</div>
+                    {%endif%}
+                </div>
+
+                <div class="row">
+                    <div class="col posts-col">
+                        <div class="row">
+                            <h2 class="account-section">Following</h2>
+                            <div class="followers-container">
+                                <a href="#" class="followers-text">10 Following</a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <h2 class="account-section">Followers</h2>
+                            <div class="followers-container">
+                                <a href="#" class="followers-text">10 Followers</a>
+                            </div>
+                        </div>
+                        
+                    </div> 
+                </div>
+                 
+            
+            </div>
+            
+        </div>
+
+    </div>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+
+</body>

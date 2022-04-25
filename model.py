@@ -273,13 +273,13 @@ UPDATE post
 '''
 UPDATE group
 '''
-def update_posts_from_group(group: Group, post: Post, groups: collection, posts: collection, errors: dict):
+# def update_posts_from_group(group: Group, post: Post, groups: collection, posts: collection, errors: dict):
     
-    try:
-        post_to_group = get_post
+#     try:
+#         post_to_group = get_post
         
-    except:
-        print('An exception occurred')
+#     except:
+#         print('An exception occurred')
 
 '''
 DELETE user

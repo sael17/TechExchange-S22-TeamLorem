@@ -16,7 +16,7 @@
 <!-- TODO: add validation for text area -->
 <div class="container mt-3">
     <form action="/post" method="post">
-        <textarea class="post-input" name="content" rows="8" placeholder="What's on you mind today?"></textarea>
+        <textarea class="post-input" name="content" rows="3" placeholder="What's on you mind today?" maxlength="300" required></textarea>
         <input type="hidden" name="group_name" value="{{group.name}}">
         <button type="submit" class="btn btn-style mb-3">Add Post</button>
     </form>
