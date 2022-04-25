@@ -1,11 +1,12 @@
 {% extends "main.html" %}
 
 {% block styles%}
+<link rel="stylesheet" href="/static/css/groups.css">
 <link rel="stylesheet" href="/static/css/posts.css">
 {% endblock %}
 
 {% block content %}
-{% for post in home_posts%}
+{% for post in recent_posts %}
 <div class="container mt-3">
     <div class="row">
         <div class="col-2 m-auto group-info">
@@ -13,11 +14,12 @@
             <p>{{ post.group }}</p>
         </div>
         <div class="col-md-10 post-content">
+            <p class="date">{{ post.date }}</p>
             <h2>{{ post.author }}</h2>
             <p>{{ post.content }}</p>
-            <p class="date">{{ post.date }}</p>
         </div>
     </div>
 </div>
 {% endfor %}
+
 {% endblock %}
