@@ -328,7 +328,7 @@ def account():
 
         except:
             return render_template("account.html",session=session,firstname="",lastname="",bio="",
-            password="******",posts=result)
+            password="******")
     
 
 
@@ -436,6 +436,12 @@ def change_username():
             return render_template("update_account.html", session=session, error_message="Username not found",
             change_username=True)
 
+@app.route("/change/profilepic",methods=["POST","GET"])
+def change_profile_pic():
+    if request.method == "GET":
+        pass
+
+    
 
 """
 Delete the users account from the users data base 
@@ -446,13 +452,17 @@ and it is redirected to the main page (index.html)
 @app.route("/delete/account",methods=["GET","POST"])
 def delete_account():
     if request.method == "POST":
-        users = mongo.db.users
         users.delete_one({"username":session["username"]})
         return redirect("/logout")
     else:
         if session.get('username'):
             return redirect(url_for('login'))
         return render_template("account.html")
+
+
+
+
+
 #TODO - If there are no posts and the user is not logged in it shows up blank, handle this edge case
 """
 ROUTE /group
